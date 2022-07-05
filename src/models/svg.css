@@ -10,4 +10,5 @@ svg circle {
 
 svg text {
     stroke: var(--main-fg-color);
+    fill: var(--main-fg-color);
 }

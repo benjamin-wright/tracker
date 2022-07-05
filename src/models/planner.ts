@@ -1,16 +1,13 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
+import { PlannerDate } from '../utils/date';
 import './svg.css';
-
-function fix(value: number): string {
-    return value.toFixed(0);
-}
 
 export default class Planner {
     private plannerSVG: HTMLElement;
-    private days: Date[];
+    private days: PlannerDate[];
 
-    constructor(doc: Document, days: Date[]) {
+    constructor(doc: Document, days: PlannerDate[]) {
         this.plannerSVG = find.byId(doc, "planner");
         this.days = days;
         this.render();
@@ -53,14 +50,12 @@ export default class Planner {
         return lines;
     }
 
-    private headers(width: number, days: Date[]): SVGTextElement[] {
-        return days.map((day: Date, index: number) =>
-            makeText(width * (index + 0.5) / days.length, 16, DAY_STRINGS[day.getDay()])
+    private headers(width: number, days: PlannerDate[]): SVGTextElement[] {
+        return days.map((day: PlannerDate, index: number) =>
+            makeText(width * (index + 0.5) / days.length, 24, day.toShortDay())
         );
     }
 }
-
-const DAY_STRINGS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function makeLine(x1: number, y1: number, x2: number, y2: number): SVGLineElement {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");

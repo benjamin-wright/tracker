@@ -11,3 +11,7 @@ start:
 stop:
 	docker stop tracker
 	docker rm tracker
+
+.PHONY: test
+test:
+	npm run test
