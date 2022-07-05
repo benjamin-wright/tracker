@@ -1,0 +1,13 @@
+svg line {
+    stroke: white;
+}
+
+svg circle {
+    stroke: blue;
+    stroke-width: 4;
+    fill: yellow;
+}
+
+svg text {
+    stroke: var(--main-fg-color);
+}

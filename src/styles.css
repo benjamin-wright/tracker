@@ -1,0 +1,49 @@
+:root {
+    --main-bg-color: rgb(46, 51, 61);
+    --secondary-bg-color: rgb(7, 21, 52);
+    --main-fg-color: rgb(217, 255, 249);
+    --main-highlight-color: rgb(133, 255, 237);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+body {
+    color: var(--main-fg-color);
+    background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+}
+
+header, section {
+    padding: 1em;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.button {
+    border: none;
+    border-radius: 0.25em;
+    color: rgb(46, 51, 61);
+    background-color: var(--main-fg-color);
+    padding: 1em;
+    line-height: 0%;
+    border: solid 2px transparent;
+}
+
+.button:hover, .button:focus {
+    background-color: var(--main-highlight-color);
+}
+
+.button:active {
+    border: solid 2px var(--main-fg-color);
+}
