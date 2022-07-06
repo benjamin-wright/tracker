@@ -16,7 +16,14 @@
       <p>This page does not work without Javascript support, please check your browser settings!</p>
     </noscript>
     <section class="grow">
-      <svg id="planner"></svg>
+      <template id="header-tpl">
+        <li></li>
+      </template>
+      <template id="task-tpl">
+        <li></li>
+      </template>
+      <ul id="planner-headers"></ul>
+      <ul id="planner-tasks"></ul>
     </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
