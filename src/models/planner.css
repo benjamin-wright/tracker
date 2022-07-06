@@ -1,0 +1,7 @@
+#planner {
+    display: grid;
+}
+
+.week {
+    grid-template-columns: 20% 20% 20% 20% 20%;
+}
