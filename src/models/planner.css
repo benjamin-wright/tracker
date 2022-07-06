@@ -4,4 +4,5 @@
 
 .week {
     grid-template-columns: 20% 20% 20% 20% 20%;
+    justify-items: center;
 }
