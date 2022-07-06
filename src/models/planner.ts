@@ -10,7 +10,30 @@ export default class Planner {
     constructor(doc: Document, days: PlannerDate[]) {
         this.plannerSVG = find.byId(doc, "planner");
         this.days = days;
-        this.render();
+    }
+
+    size(): { width: number, height: number } {
+        if (!this.plannerSVG.parentElement) {
+            throw new Error("drawing space can't see its parent");
+        }
+
+        const style = getComputedStyle(this.plannerSVG.parentElement);
+
+        const size = {
+            width: this.plannerSVG.parentElement.clientWidth - (parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)),
+            height: this.plannerSVG.parentElement.clientHeight - (parseFloat(style.paddingTop) + parseFloat(style.paddingBottom))
+        }
+
+        console.log(`
+            Width (pad): ${parseFloat(style.paddingLeft)} <- ${ this.plannerSVG.parentElement.clientWidth } -> ${style.paddingRight}
+            Height (pad): ${parseFloat(style.paddingTop)} <- ${ this.plannerSVG.parentElement.clientHeight } -> ${style.paddingBottom}
+            Width: ${size.width} (${style.width})
+            Height: ${size.height} (${style.height})
+
+            Calc: ${this.plannerSVG.parentElement.clientHeight} - (${parseFloat(style.paddingTop)} + ${parseFloat(style.paddingBottom)}) = ${this.plannerSVG.parentElement.clientHeight - (parseFloat(style.paddingTop) + parseFloat(style.paddingBottom))}
+        `);
+
+        return size
     }
 
     async render() {
@@ -22,11 +45,12 @@ export default class Planner {
             throw new Error("drawing space can't see its parent");
         }
 
-        const width = this.plannerSVG.parentElement.clientWidth * 0.95;
+        const width = 200 * this.days.length;
         const height = width;
 
-        this.plannerSVG.setAttribute("width", width.toFixed(0));
-        this.plannerSVG.setAttribute("height", width.toFixed(0));
+        this.plannerSVG.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        this.plannerSVG.setAttribute("width", "100%");
+        this.plannerSVG.setAttribute("height", "auto");
         this.plannerSVG.append(...this.grid(width, height, this.days.length));
         this.plannerSVG.append(...this.headers(width, this.days));
     }

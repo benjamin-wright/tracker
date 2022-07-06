@@ -18,6 +18,8 @@ html, body {
 body {
     color: var(--main-fg-color);
     background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    display: flex;
+    flex-direction: column;
 }
 
 header, section {
@@ -28,6 +30,10 @@ header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.grow {
+    flex-grow: 1;
 }
 
 .button {
