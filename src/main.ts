@@ -5,7 +5,7 @@ import Planner from "./models/planner";
 
 const navBar = new NavBar(document);
 
-const planner = new Planner(document, date.lastNDays(3));
+const planner = new Planner(document, date.lastNDays(4), 200);
 
 planner.render();
 

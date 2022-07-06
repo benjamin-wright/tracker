@@ -6,10 +6,12 @@ import './svg.css';
 export default class Planner {
     private plannerSVG: HTMLElement;
     private days: PlannerDate[];
+    private scale: number;
 
-    constructor(doc: Document, days: PlannerDate[]) {
+    constructor(doc: Document, days: PlannerDate[], scale: number) {
         this.plannerSVG = find.byId(doc, "planner");
         this.days = days;
+        this.scale = scale;
     }
 
     size(): { width: number, height: number } {
@@ -45,8 +47,8 @@ export default class Planner {
             throw new Error("drawing space can't see its parent");
         }
 
-        const width = 200 * this.days.length;
-        const height = width;
+        const width = this.scale * this.days.length;
+        const height = this.scale * 3;
 
         this.plannerSVG.setAttribute("viewBox", `0 0 ${width} ${height}`);
         this.plannerSVG.setAttribute("width", "100%");
