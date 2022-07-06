@@ -1,6 +1,6 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
-import { PlannerDate } from '../utils/date';
+import PlannerDate from '../utils/planner-date';
 import './svg.css';
 
 export default class Planner {

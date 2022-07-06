@@ -1,11 +1,11 @@
 import "./styles.css"
-import * as date from './utils/date';
+import PlannerDate from './utils/planner-date';
 import NavBar from "./models/nav-bar";
 import Planner from "./models/planner";
 
 const navBar = new NavBar(document);
 
-const planner = new Planner(document, date.lastNDays(4), 200);
+const planner = new Planner(document, PlannerDate.ThisWeek(), 200);
 
 planner.render();
 

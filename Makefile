@@ -1,5 +1,5 @@
 .PHONY: start
-start:
+start: stop
 	docker run -d \
 		--name tracker \
 		-v $(shell pwd)/dist:/usr/share/nginx/html \
@@ -9,8 +9,8 @@ start:
 
 .PHONY: stop
 stop:
-	docker stop tracker
-	docker rm tracker
+	-docker stop tracker
+	-docker rm tracker
 
 .PHONY: test
 test:
