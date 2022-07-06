@@ -14,30 +14,6 @@ export default class Planner {
         this.scale = scale;
     }
 
-    size(): { width: number, height: number } {
-        if (!this.plannerSVG.parentElement) {
-            throw new Error("drawing space can't see its parent");
-        }
-
-        const style = getComputedStyle(this.plannerSVG.parentElement);
-
-        const size = {
-            width: this.plannerSVG.parentElement.clientWidth - (parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)),
-            height: this.plannerSVG.parentElement.clientHeight - (parseFloat(style.paddingTop) + parseFloat(style.paddingBottom))
-        }
-
-        console.log(`
-            Width (pad): ${parseFloat(style.paddingLeft)} <- ${ this.plannerSVG.parentElement.clientWidth } -> ${style.paddingRight}
-            Height (pad): ${parseFloat(style.paddingTop)} <- ${ this.plannerSVG.parentElement.clientHeight } -> ${style.paddingBottom}
-            Width: ${size.width} (${style.width})
-            Height: ${size.height} (${style.height})
-
-            Calc: ${this.plannerSVG.parentElement.clientHeight} - (${parseFloat(style.paddingTop)} + ${parseFloat(style.paddingBottom)}) = ${this.plannerSVG.parentElement.clientHeight - (parseFloat(style.paddingTop) + parseFloat(style.paddingBottom))}
-        `);
-
-        return size
-    }
-
     async render() {
         await graphics.nextFrame();
 
