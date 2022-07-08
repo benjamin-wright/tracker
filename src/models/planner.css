@@ -6,3 +6,13 @@
     grid-template-columns: 20% 20% 20% 20% 20%;
     justify-items: center;
 }
+
+.header-col {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.header-col:not(:last-child) {
+    border-right: solid 1px var(--main-fg-color);
+}

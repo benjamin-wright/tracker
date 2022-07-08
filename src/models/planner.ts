@@ -8,13 +8,11 @@ export default class Planner {
     private headerTemplate: HTMLTemplateElement;
 
     private days: PlannerDate[];
-    private scale: number;
 
-    constructor(doc: Document, days: PlannerDate[], scale: number) {
+    constructor(doc: Document, days: PlannerDate[]) {
         this.planner = find.byId(doc, "planner");
         this.headerTemplate = find.templateById(doc, "header-tpl");
         this.days = days;
-        this.scale = scale;
     }
 
     async render() {
@@ -31,17 +29,25 @@ export default class Planner {
     }
 
     private headers(days: PlannerDate[]): Node[] {
-        return days.map((day: PlannerDate, index: number) => {
+        return days.map((day: PlannerDate, _index: number) => {
             if (!this.headerTemplate.content.firstElementChild) {
                 throw new Error("header template did not contain a valid HTML element");
             }
 
-            const header = this.headerTemplate.content.firstElementChild.cloneNode(true);
+            const header = <HTMLDivElement>this.headerTemplate.content.firstElementChild.cloneNode(true);
 
-            const para = header as HTMLParagraphElement;
-            para.innerText = day.toShortDay();
+
+            const para = header.querySelector("p");
+            if (!para) {
+                throw new Error("expected header template to contain a paragraph!");
+            }
+
+            para.innerHTML = day.toShortDay();
             para.title = day.toString();
-            return para;
+
+            console.info(header);
+
+            return header;
         });
     }
 }

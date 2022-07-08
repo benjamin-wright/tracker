@@ -5,7 +5,7 @@ import Planner from "./models/planner";
 
 const navBar = new NavBar(document);
 
-const planner = new Planner(document, PlannerDate.ThisWeek(), 200);
+const planner = new Planner(document, PlannerDate.ThisWeek());
 
 planner.render();
 
