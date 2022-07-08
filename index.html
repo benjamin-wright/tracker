@@ -21,9 +21,14 @@
       </div>
     </template>
     <template id="task-tpl">
-      <li></li>
+      <div class="task">
+        <p></p>
+      </div>
     </template>
-    <section id="planner" class="grow week"></section>
+    <section id="planner" class="grow">
+      <div id="planner-background" class="week"></div>
+      <div id="planner-tasks" class="overlay"></div>
+    </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

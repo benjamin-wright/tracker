@@ -1,10 +1,28 @@
 #planner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#planner-background {
     display: grid;
+}
+
+#planner-tasks {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3em 1em 1em 1em;
 }
 
 .week {
     grid-template-columns: 20% 20% 20% 20% 20%;
     justify-items: center;
+    height: 100%;
 }
 
 .header-col {

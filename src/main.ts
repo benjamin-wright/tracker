@@ -1,19 +1,25 @@
+import Week from "./models/week";
 import "./styles.css"
-import PlannerDate from './utils/planner-date';
-import NavBar from "./models/nav-bar";
-import Planner from "./models/planner";
+import NavBar from "./views/nav-bar";
+import Planner from "./views/planner";
 
 const navBar = new NavBar(document);
+const planner = new Planner(document);
 
-const planner = new Planner(document, PlannerDate.ThisWeek());
+const model = new Week();
+model.addTask("Hello World!");
 
-planner.render();
+const render = () => {
+    planner.render(model.getDays(), model.getTasks());
+}
 
+render();
 window.onresize = () => {
-    planner.render();
+    render();
 }
 
 navBar.onNewActivity(() => {
-    alert('hi!');
+    model.addTask("new task!");
+    render();
 });
 
