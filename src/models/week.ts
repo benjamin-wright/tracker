@@ -14,8 +14,8 @@ export default class Week {
         return this.days;
     }
 
-    addTask(content: string) {
-        this.tasks.push(new Task(content, null));
+    addTask(content: string, start: Date | null) {
+        this.tasks.push(new Task(content, start));
     }
 
     getTasks(): Task[] {

@@ -51,29 +51,45 @@ export default class Planner {
             para.innerHTML = day.toShortDay();
             para.title = day.toString();
 
-            console.info(header);
+            header.title = day.toString();
 
             return header;
         });
     }
 
     private makeTasks(days: PlannerDate[], tasks: Task[]): Node[] {
+
         return tasks.map(t => {
             if (!this.taskTemplate.content.firstElementChild) {
                 throw new Error("header template did not contain a valid HTML element");
             }
 
-            const header = <HTMLDivElement>this.taskTemplate.content.firstElementChild.cloneNode(true);
+            const day = days.findIndex(d => d.isToday(t.getStart()));
+            if (day == -1) {
+                throw new Error("task was not in the current week");
+            }
 
-            const para = header.querySelector("p");
+            const today = days.findIndex(d => d.isToday(new Date()));
+            if (today == -1) {
+                throw new Error("current day is not in the current week");
+            }
+
+            const task = <HTMLDivElement>this.taskTemplate.content.firstElementChild.cloneNode(true);
+
+            const para = task.querySelector("p");
             if (!para) {
-                throw new Error("expected header template to contain a paragraph!");
+                throw new Error("expected task template to contain a paragraph!");
             }
 
             para.innerHTML = t.getContent();
-            para.title = t.getContent();
 
-            return header;
+            const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
+            const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
+
+            task.title = `Task: ${t.getContent()}`;
+            task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
+
+            return task;
         });
     }
 }

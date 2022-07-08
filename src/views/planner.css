@@ -17,6 +17,7 @@
     left: 0;
     right: 0;
     padding: 3em 1em 1em 1em;
+    pointer-events: none;
 }
 
 .week {
@@ -33,4 +34,23 @@
 
 .header-col:not(:last-child) {
     border-right: solid 1px var(--main-fg-color);
+}
+
+.task {
+    background-color: var(--main-fg-color);
+    border: solid 1px var(--main-highlight-color);
+    border-radius: 0.25em;
+    color: var(--main-bg-color);
+    padding: 0.5em;
+    margin: 0.5em 0;
+    pointer-events: all;
+}
+
+.task:hover {
+    background-color: var(--main-highlight-color);
+    border: solid 1px var(--main-fg-color);
+}
+
+.task p {
+    overflow: clip;
 }
