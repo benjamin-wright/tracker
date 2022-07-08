@@ -15,19 +15,24 @@
     <noscript>
       <p>This page does not work without Javascript support, please check your browser settings!</p>
     </noscript>
-    <template id="header-tpl">
-      <div class="header-col">
-        <p></p>
-      </div>
-    </template>
-    <template id="task-tpl">
-      <div class="task">
-        <p></p>
-      </div>
-    </template>
     <section id="planner" class="grow">
+
+      <!-- Planner headers and columns -->
+      <template id="header-tpl">
+        <div class="header-col">
+          <p></p>
+        </div>
+      </template>
       <div id="planner-background" class="week"></div>
+
+      <!-- Task plotting overlay -->
+      <template id="task-tpl">
+        <div class="task">
+          <p></p>
+        </div>
+      </template>
       <div id="planner-tasks" class="overlay"></div>
+
     </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
