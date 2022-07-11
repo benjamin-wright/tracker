@@ -127,8 +127,6 @@ export default class Planner {
             const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
             const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
 
-            console.log(`${days[day].getDayFraction(t.getStart())} => ${startLocation}`);
-
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
             task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
 
