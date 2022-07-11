@@ -7,14 +7,52 @@ import './planner.css';
 export default class Planner {
     private headers: HTMLElement;
     private tasks: HTMLElement;
+    private popup: HTMLElement;
+    private newTaskForm: HTMLFormElement;
+    private taskDescription: HTMLInputElement;
+    private taskStartDate: HTMLInputElement;
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
+    private newTaskCallback: (t: Task) => void = (_t: Task) => {};
 
     constructor(doc: Document) {
         this.headers = find.byId(doc, "planner-background");
         this.tasks = find.byId(doc, "planner-tasks");
+        this.popup = find.byId(doc, "new-action-prompt")
+        this.newTaskForm = find.byId(doc, "new-task-form") as HTMLFormElement;
+        this.taskDescription = find.byId(doc, "task-description") as HTMLInputElement;
+        this.taskStartDate = find.byId(doc, "task-start-date") as HTMLInputElement;
         this.headerTemplate = find.templateById(doc, "header-tpl");
         this.taskTemplate = find.templateById(doc, "task-tpl");
+
+        this.newTaskForm.onsubmit = (ev: SubmitEvent) => {
+            ev.preventDefault();
+
+            const task = new Task(
+                this.taskDescription.value,
+                new Date(this.taskStartDate.value)
+            );
+
+            this.taskDescription.value = "";
+            this.taskStartDate.value = "";
+
+            this.popup.hidden = true;
+            this.popup.classList.remove("popup");
+
+            this.newTaskCallback(task);
+        };
+
+        this.newTaskForm.onreset = (_: Event) => {
+            this.taskDescription.value = "";
+            this.taskStartDate.value = "";
+
+            this.popup.hidden = true;
+            this.popup.classList.remove("popup");
+        };
+    }
+
+    onNewTask(callback: (t: Task) => void) {
+        this.newTaskCallback = callback;
     }
 
     async render(days: PlannerDate[], tasks: Task[]) {
@@ -58,27 +96,30 @@ export default class Planner {
     }
 
     private makeTasks(days: PlannerDate[], tasks: Task[]): Node[] {
-
-        return tasks.map(t => {
+        return tasks.reduce<Node[]>((accumulator: Node[], t: Task) => {
             if (!this.taskTemplate.content.firstElementChild) {
-                throw new Error("header template did not contain a valid HTML element");
+                console.error("header template did not contain a valid HTML element");
+                return accumulator;
             }
 
             const day = days.findIndex(d => d.isToday(t.getStart()));
             if (day == -1) {
-                throw new Error("task was not in the current week");
+                console.error(`task ${t.getContent()} was not in the current week: ${t.getStart().toString()}`);
+                return accumulator
             }
 
             const today = days.findIndex(d => d.isToday(new Date()));
             if (today == -1) {
-                throw new Error("current day is not in the current week");
+                console.error(`current day is not in the current week`);
+                return accumulator;
             }
 
             const task = <HTMLDivElement>this.taskTemplate.content.firstElementChild.cloneNode(true);
 
             const para = task.querySelector("p");
             if (!para) {
-                throw new Error("expected task template to contain a paragraph!");
+                console.error("expected task template to contain a paragraph!");
+                return accumulator;
             }
 
             para.innerHTML = t.getContent();
@@ -86,10 +127,19 @@ export default class Planner {
             const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
             const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
 
-            task.title = `Task: ${t.getContent()}`;
+            console.log(`${days[day].getDayFraction(t.getStart())} => ${startLocation}`);
+
+            task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
             task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
 
-            return task;
-        });
+            accumulator.push(task);
+
+            return accumulator;
+        }, []);
+    }
+
+    showPopup() {
+        this.popup.hidden = false;
+        this.popup.classList.add("popup");
     }
 }

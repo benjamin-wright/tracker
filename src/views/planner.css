@@ -54,3 +54,51 @@
 .task p {
     overflow: clip;
 }
+
+.popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--main-popup-bg-color);
+}
+
+.popup form {
+    padding: 2em;
+    border-radius: 1em;
+    background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    display: flex;
+    flex-direction: column;
+}
+
+.popup form > * {
+    margin: 0.5em;
+}
+
+.popup div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup fieldset {
+    padding: 1em;
+}
+
+.popup input {
+    padding: 0.5em;
+}
+
+.popup button {
+    padding: 0.5em 2em;
+    cursor: pointer;
+}
+
+.popup button[type=reset] {
+    background-color: var(--main-neg-bg-color);
+}
+
+.popup button, .popup input {
+    background-color: var(--main-fg-color);
+}

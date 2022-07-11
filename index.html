@@ -34,6 +34,24 @@
       <div id="planner-tasks" class="overlay"></div>
 
     </section>
+    <section id="new-action-prompt" hidden>
+      <form id="new-task-form">
+        <fieldset>
+          <label>Task: </label>
+          <input type="text" placeholder="description" id="task-description" required />
+        </fieldset>
+
+        <fieldset>
+          <label>Start: </label>
+          <input type="datetime-local" id="task-start-date" required />
+        </fieldset>
+
+        <div>
+          <button type="submit">OK</button>
+          <button type="reset">Cancel</button>
+        </div>
+      </form>
+    </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

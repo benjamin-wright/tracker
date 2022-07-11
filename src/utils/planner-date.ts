@@ -59,11 +59,11 @@ export default class PlannerDate {
     }
 
     isToday(date: Date): boolean {
-        return this.date.getFullYear() == date.getFullYear() && this.date.getMonth() == date.getMonth() && this.date.getDay() == date.getDay();
+        return this.date.getFullYear() == date.getFullYear() && this.date.getMonth() == date.getMonth() && this.date.getDate() == date.getDate();
     }
 
     getDayFraction(date: Date): number {
-        const hour = date.getHours();
+        const hour = date.getHours() + date.getMinutes() / 60;
         const fraction = (hour - DAY_START_TIME) / (DAY_END_TIME - DAY_START_TIME);
 
         if (fraction < 0) {
