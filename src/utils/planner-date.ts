@@ -1,5 +1,8 @@
 const DAYS_MAP_SHORT = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
 
+const DAY_START_TIME = 9;
+const DAY_END_TIME = 17;
+
 function toFixedWidth(n: number): string {
     if (n < 10) {
         return "0" + n.toFixed(0);
@@ -53,5 +56,24 @@ export default class PlannerDate {
 
     toString(): string {
         return `${this.date.getFullYear()}-${toFixedWidth(this.date.getMonth() + 1)}-${toFixedWidth(this.date.getDate())}: ${this.toShortDay()}`;
+    }
+
+    isToday(date: Date): boolean {
+        return this.date.getFullYear() == date.getFullYear() && this.date.getMonth() == date.getMonth() && this.date.getDate() == date.getDate();
+    }
+
+    getDayFraction(date: Date): number {
+        const hour = date.getHours() + date.getMinutes() / 60;
+        const fraction = (hour - DAY_START_TIME) / (DAY_END_TIME - DAY_START_TIME);
+
+        if (fraction < 0) {
+            return 0;
+        }
+
+        if (fraction > 1) {
+            return 1;
+        }
+
+        return fraction;
     }
 }

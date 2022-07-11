@@ -1,0 +1,104 @@
+#planner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#planner-background {
+    display: grid;
+}
+
+#planner-tasks {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3em 1em 1em 1em;
+    pointer-events: none;
+}
+
+.week {
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    justify-items: center;
+    height: 100%;
+}
+
+.header-col {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.header-col:not(:last-child) {
+    border-right: solid 1px var(--main-fg-color);
+}
+
+.task {
+    background-color: var(--main-fg-color);
+    border: solid 1px var(--main-highlight-color);
+    border-radius: 0.25em;
+    color: var(--main-bg-color);
+    padding: 0.5em;
+    margin: 0.5em 0;
+    pointer-events: all;
+}
+
+.task:hover {
+    background-color: var(--main-highlight-color);
+    border: solid 1px var(--main-fg-color);
+}
+
+.task p {
+    overflow: clip;
+}
+
+.popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--main-popup-bg-color);
+}
+
+.popup form {
+    padding: 2em;
+    border-radius: 1em;
+    background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    display: flex;
+    flex-direction: column;
+}
+
+.popup form > * {
+    margin: 0.5em;
+}
+
+.popup div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup fieldset {
+    padding: 1em;
+}
+
+.popup input {
+    padding: 0.5em;
+}
+
+.popup button {
+    padding: 0.5em 2em;
+    cursor: pointer;
+}
+
+.popup button[type=reset] {
+    background-color: var(--main-neg-bg-color);
+}
+
+.popup button, .popup input {
+    background-color: var(--main-fg-color);
+}

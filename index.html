@@ -15,8 +15,42 @@
     <noscript>
       <p>This page does not work without Javascript support, please check your browser settings!</p>
     </noscript>
-    <section class="grow">
-      <svg id="planner"></svg>
+    <section id="planner" class="grow">
+
+      <!-- Planner headers and columns -->
+      <template id="header-tpl">
+        <div class="header-col">
+          <p></p>
+        </div>
+      </template>
+      <div id="planner-background" class="week"></div>
+
+      <!-- Task plotting overlay -->
+      <template id="task-tpl">
+        <div class="task">
+          <p></p>
+        </div>
+      </template>
+      <div id="planner-tasks" class="overlay"></div>
+
+    </section>
+    <section id="new-action-prompt" hidden>
+      <form id="new-task-form">
+        <fieldset>
+          <label>Task: </label>
+          <input type="text" placeholder="description" id="task-description" required />
+        </fieldset>
+
+        <fieldset>
+          <label>Start: </label>
+          <input type="datetime-local" id="task-start-date" required />
+        </fieldset>
+
+        <div>
+          <button type="submit">OK</button>
+          <button type="reset">Cancel</button>
+        </div>
+      </form>
     </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
