@@ -1,3 +1,4 @@
+import { toRFC3339String } from '../utils/date';
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
 import PlannerDate from '../utils/planner-date';
@@ -137,6 +138,8 @@ export default class Planner {
     }
 
     showPopup() {
+        this.taskStartDate.value = toRFC3339String(new Date());
+
         this.popup.hidden = false;
         this.popup.classList.add("popup");
     }
