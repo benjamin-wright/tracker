@@ -12,9 +12,11 @@ export default class Planner {
     private newTaskForm: HTMLFormElement;
     private taskDescription: HTMLInputElement;
     private taskStartDate: HTMLInputElement;
+    private taskId: HTMLInputElement;
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
     private newTaskCallback: (t: Task) => void = (_t: Task) => {};
+    private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
 
     constructor(doc: Document) {
         this.headers = find.byId(doc, "planner-background");
@@ -23,6 +25,7 @@ export default class Planner {
         this.newTaskForm = find.byId(doc, "new-task-form") as HTMLFormElement;
         this.taskDescription = find.byId(doc, "task-description") as HTMLInputElement;
         this.taskStartDate = find.byId(doc, "task-start-date") as HTMLInputElement;
+        this.taskId = find.byId(doc, "task-id") as HTMLInputElement;
         this.headerTemplate = find.templateById(doc, "header-tpl");
         this.taskTemplate = find.templateById(doc, "task-tpl");
 
@@ -31,16 +34,17 @@ export default class Planner {
 
             const task = new Task(
                 this.taskDescription.value,
-                new Date(this.taskStartDate.value)
+                new Date(this.taskStartDate.value),
+                this.taskId.value ? parseInt(this.taskId.value) : null
             );
 
-            this.taskDescription.value = "";
-            this.taskStartDate.value = "";
+            if (this.taskId.value === "") {
+                this.newTaskCallback(task);
+            } else {
+                this.updateTaskCallback(task);
+            }
 
-            this.popup.hidden = true;
-            this.popup.classList.remove("popup");
-
-            this.newTaskCallback(task);
+            this.closePopup();
         };
 
         this.newTaskForm.onreset = (_: Event) => {
@@ -54,6 +58,10 @@ export default class Planner {
 
     onNewTask(callback: (t: Task) => void) {
         this.newTaskCallback = callback;
+    }
+
+    onUpdateTask(callback: (t: Task) => void) {
+        this.updateTaskCallback = callback;
     }
 
     async render(days: PlannerDate[], tasks: Task[]) {
@@ -131,16 +139,40 @@ export default class Planner {
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
             task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
 
+            task.onclick = () => {
+                this.updateTask(t);
+            };
+
             accumulator.push(task);
 
             return accumulator;
         }, []);
     }
 
-    showPopup() {
+    newTask() {
         this.taskStartDate.value = toRFC3339String(new Date());
 
         this.popup.hidden = false;
         this.popup.classList.add("popup");
+    }
+
+    updateTask(t: Task) {
+        this.taskId.value = t.getId().toFixed(0);
+        this.taskDescription.value = t.getContent();
+        this.taskStartDate.value = toRFC3339String(t.getStart());
+
+        console.log(this.taskId.value);
+
+        this.popup.hidden = false;
+        this.popup.classList.add("popup");
+    }
+
+    closePopup() {
+        this.taskId.value = "";
+        this.taskDescription.value = "";
+        this.taskStartDate.value = "";
+
+        this.popup.hidden = true;
+        this.popup.classList.remove("popup");
     }
 }

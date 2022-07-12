@@ -8,7 +8,7 @@ const navBar = new NavBar(document);
 const planner = new Planner(document);
 
 const model = new Week();
-model.addTask(new Task("Hello World!", new Date("2022-07-11T10:00:00")));
+model.addTask(new Task("Hello World!", new Date("2022-07-11T10:00:00"), null));
 
 const render = () => {
     planner.render(model.getDays(), model.getTasks());
@@ -17,10 +17,15 @@ const render = () => {
 render();
 
 navBar.onNewActivity(() => {
-    planner.showPopup();
+    planner.newTask();
 });
 
 planner.onNewTask((t: Task) => {
     model.addTask(t);
     render();
 });
+
+planner.onUpdateTask((t: Task) => {
+    model.updateTask(t);
+    render();
+})
