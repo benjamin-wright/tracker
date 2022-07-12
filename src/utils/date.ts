@@ -28,3 +28,17 @@ export function toRFC3339String(d: Date): string {
         paddedString(minutes, 2)
     }`;
 }
+
+export function toWeekString(d: Date): string {
+    let day = new Date(d);
+
+    // wind back to the 0th day (sunday)
+    while (day.getDay() > 0) {
+        day.setDate(day.getDate() - 1);
+    }
+
+    // go forward one
+    day.setDate(day.getDate() + 1);
+
+    return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
+}

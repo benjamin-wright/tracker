@@ -30,4 +30,26 @@ export default class Task {
     setStart(start: Date) {
         this.start = start;
     }
+
+    toString(): string {
+        return JSON.stringify(this);
+    }
+
+    static fromString(value: string): Task {
+        const data = JSON.parse(value);
+        
+        return new Task(
+            data.content,
+            new Date(data.start),
+            data.id
+        );
+    }
+
+    static setLastId(value: number) {
+        lastId = value;
+    }
+
+    static getLastID(): number {
+        return lastId;
+    }
 }

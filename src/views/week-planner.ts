@@ -5,7 +5,7 @@ import PlannerDate from '../utils/planner-date';
 import Task from '../utils/task';
 import './planner.css';
 
-export default class Planner {
+export default class WeekPlanner {
     private headers: HTMLElement;
     private tasks: HTMLElement;
     private popup: HTMLElement;

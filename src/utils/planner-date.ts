@@ -76,4 +76,8 @@ export default class PlannerDate {
 
         return fraction;
     }
+
+    getDate(): Date {
+        return this.date;
+    }
 }

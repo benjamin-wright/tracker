@@ -6,6 +6,6 @@ describe('toRFC3339String', () => {
             toRFC3339String(
                 new Date('2022-05-25T12:34:56.789Z')
             )
-        ).toEqual('2022-05-25T12:34');
+        ).toEqual('2022-05-25T13:34');
     });
 });
