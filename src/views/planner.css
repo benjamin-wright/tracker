@@ -41,7 +41,6 @@
     border: solid 1px var(--main-highlight-color);
     border-radius: 0.25em;
     color: var(--main-bg-color);
-    padding: 0.5em;
     margin: 0.5em 0;
     pointer-events: all;
     cursor: pointer;
@@ -52,8 +51,14 @@
     border: solid 1px var(--main-fg-color);
 }
 
+.task.started {
+    border-left: solid 0.3em var(--main-start-color);
+}
+
 .task p {
     overflow: clip;
+    white-space: nowrap;
+    padding: 0.5em;
 }
 
 .popup {
@@ -85,10 +90,18 @@
 
 .popup fieldset {
     padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.popup fieldset > :first-child {
+    margin-right: 0.5em;
 }
 
 .popup input {
     padding: 0.5em;
+    flex-grow: 1;
 }
 
 .popup button {
@@ -97,9 +110,24 @@
 }
 
 .popup button[type=reset] {
-    background-color: var(--main-neg-bg-color);
+    color: var(--main-neg-bg-color);
+    background-color: transparent;
+    border: none;
+    font-size: 1.25em;
+    margin: 0;
+    padding: 0;
 }
 
 .popup button, .popup input {
     background-color: var(--main-fg-color);
+}
+
+button.delete {
+    background-color: var(--main-neg-bg-color);
+}
+
+.popup .right {
+    display: flex;
+    justify-content: flex-end;
+    margin: -0.8em -0.5em 0.5em;
 }

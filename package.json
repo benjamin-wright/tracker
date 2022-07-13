@@ -7,7 +7,7 @@
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
     "preview": "vite preview",
-    "test": "jest ./src"
+    "test": "jest ./src --verbose"
   },
   "devDependencies": {
     "@types/jest": "^28.1.4",

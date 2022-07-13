@@ -13,10 +13,12 @@ export default class WeekPlanner {
     private taskDescription: HTMLInputElement;
     private taskStartDate: HTMLInputElement;
     private taskId: HTMLInputElement;
+    private taskDelete: HTMLInputElement;
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
     private newTaskCallback: (t: Task) => void = (_t: Task) => {};
     private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
+    private deleteTaskCallback: (t: Task) => void = (_t: Task) => {};
 
     constructor(doc: Document) {
         this.headers = find.byId(doc, "planner-background");
@@ -26,6 +28,7 @@ export default class WeekPlanner {
         this.taskDescription = find.byId(doc, "task-description") as HTMLInputElement;
         this.taskStartDate = find.byId(doc, "task-start-date") as HTMLInputElement;
         this.taskId = find.byId(doc, "task-id") as HTMLInputElement;
+        this.taskDelete = find.byId(doc, "task-delete") as HTMLInputElement;
         this.headerTemplate = find.templateById(doc, "header-tpl");
         this.taskTemplate = find.templateById(doc, "task-tpl");
 
@@ -41,7 +44,11 @@ export default class WeekPlanner {
             if (this.taskId.value === "") {
                 this.newTaskCallback(task);
             } else {
-                this.updateTaskCallback(task);
+                if (ev.submitter == this.taskDelete) {
+                    this.deleteTaskCallback(task);
+                } else {
+                    this.updateTaskCallback(task);
+                }
             }
 
             this.closePopup();
@@ -62,6 +69,10 @@ export default class WeekPlanner {
 
     onUpdateTask(callback: (t: Task) => void) {
         this.updateTaskCallback = callback;
+    }
+
+    onDeleteTask(callback: (t: Task) => void) {
+        this.deleteTaskCallback = callback;
     }
 
     async render(days: PlannerDate[], tasks: Task[]) {
@@ -163,6 +174,7 @@ export default class WeekPlanner {
 
         console.log(this.taskId.value);
 
+        this.taskDelete.hidden = false;
         this.popup.hidden = false;
         this.popup.classList.add("popup");
     }
@@ -173,6 +185,7 @@ export default class WeekPlanner {
         this.taskStartDate.value = "";
 
         this.popup.hidden = true;
+        this.taskDelete.hidden = true;
         this.popup.classList.remove("popup");
     }
 }

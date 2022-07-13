@@ -66,6 +66,10 @@ export default class Tasks {
         }
 
         this.tasks[key].splice(index, 1);
+        if (this.tasks[key].length === 0) {
+            delete this.tasks[key];
+        }
+
         delete this.lookup[id];
         this.changes.push(key);
     }

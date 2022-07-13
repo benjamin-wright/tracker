@@ -27,7 +27,7 @@
 
       <!-- Task plotting overlay -->
       <template id="task-tpl">
-        <div class="task">
+        <div class="task started">
           <p></p>
         </div>
       </template>
@@ -37,6 +37,10 @@
     <section id="new-action-prompt" hidden>
       <form id="new-task-form">
         <input id="task-id" type="text" hidden/>
+
+        <div class="right">
+          <button type="reset">X</button>
+        </div>
 
         <fieldset>
           <label>Task: </label>
@@ -50,7 +54,7 @@
 
         <div>
           <button type="submit">OK</button>
-          <button type="reset">Cancel</button>
+          <button type="submit" id="task-delete" class="delete" hidden>Delete</button>
         </div>
       </form>
     </section>

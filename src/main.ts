@@ -31,4 +31,10 @@ planner.onUpdateTask((t: Task) => {
     model.updateTask(t);
     model.save();
     render();
-})
+});
+
+planner.onDeleteTask((t: Task) => {
+    model.removeTask(t.getId());
+    model.save();
+    render();
+});

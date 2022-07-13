@@ -28,4 +28,12 @@ export default class LocalStorageMock {
     get length(): number {
         return Object.keys(this.store).length;
     }
+
+    setStore(store: {[key: string]: string}) {
+        this.store = store;
+    }
+
+    getStore(): {[key: string]: string} {
+        return this.store;
+    }
 }
