@@ -55,11 +55,7 @@ export default class WeekPlanner {
         };
 
         this.newTaskForm.onreset = (_: Event) => {
-            this.taskDescription.value = "";
-            this.taskStartDate.value = "";
-
-            this.popup.hidden = true;
-            this.popup.classList.remove("popup");
+            this.closePopup();
         };
     }
 
@@ -163,6 +159,7 @@ export default class WeekPlanner {
     newTask() {
         this.taskStartDate.value = toRFC3339String(new Date());
 
+        this.taskDelete.hidden = true;
         this.popup.hidden = false;
         this.popup.classList.add("popup");
     }
