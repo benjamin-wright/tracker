@@ -112,6 +112,11 @@ export default class WeekPlanner {
     }
 
     private makeTasks(days: PlannerDate[], tasks: Task[]): Node[] {
+        let today = days.findIndex(d => d.isToday(new Date()));
+        if (today == -1) {
+            today = days.length - 1;
+        }
+
         return tasks.reduce<Node[]>((accumulator: Node[], t: Task) => {
             if (!this.taskTemplate.content.firstElementChild) {
                 console.error("header template did not contain a valid HTML element");
@@ -122,12 +127,6 @@ export default class WeekPlanner {
             if (day == -1) {
                 console.error(`task ${t.getContent()} was not in the current week: ${t.getStart().toString()}`);
                 return accumulator
-            }
-
-            const today = days.findIndex(d => d.isToday(new Date()));
-            if (today == -1) {
-                console.error(`current day is not in the current week`);
-                return accumulator;
             }
 
             const task = <HTMLDivElement>this.taskTemplate.content.firstElementChild.cloneNode(true);
@@ -146,7 +145,8 @@ export default class WeekPlanner {
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
             task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
 
-            task.onclick = () => {
+            task.onclick = (event) => {
+                event.preventDefault();
                 this.updateTask(t);
             };
 
@@ -168,8 +168,6 @@ export default class WeekPlanner {
         this.taskId.value = t.getId().toFixed(0);
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
-
-        console.log(this.taskId.value);
 
         this.taskDelete.hidden = false;
         this.popup.hidden = false;

@@ -6,7 +6,7 @@ export default class Task {
     private start: Date;
 
     constructor(content: string, start: Date | null, id: number | null) {
-        this.id = id || lastId++;
+        this.id = id !== null ? id : lastId++;
         this.content = content;
         this.start = start ? start : new Date();
     }

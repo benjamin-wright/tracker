@@ -38,6 +38,10 @@ export default class Tasks {
     updateTask(task: Task) {
         console.debug(`updating task ${task.getId()}`);
         const key = toWeekString(task.getStart());
+
+        console.log(this.lookup);
+        console.log(task);
+
         if (key !== this.lookup[task.getId()]) {
             this.removeTask(task.getId());
             this.addTask(task);

@@ -8,11 +8,11 @@ import WeekPlanner from "./views/week-planner";
 const navBar = new NavBar(document);
 const planner = new WeekPlanner(document);
 
-const model = new Tasks(window.localStorage, PlannerDate.ThisWeek());
-model.load();
+const tasks = new Tasks(window.localStorage, PlannerDate.ThisWeek());
+tasks.load();
 
 const render = () => {
-    planner.render(model.getDays(), model.getTasks());
+    planner.render(tasks.getDays(), tasks.getTasks());
 }
 
 render();
@@ -22,19 +22,19 @@ navBar.onNewActivity(() => {
 });
 
 planner.onNewTask((t: Task) => {
-    model.addTask(t);
-    model.save();
+    tasks.addTask(t);
+    tasks.save();
     render();
 });
 
 planner.onUpdateTask((t: Task) => {
-    model.updateTask(t);
-    model.save();
+    tasks.updateTask(t);
+    tasks.save();
     render();
 });
 
 planner.onDeleteTask((t: Task) => {
-    model.removeTask(t.getId());
-    model.save();
+    tasks.removeTask(t.getId());
+    tasks.save();
     render();
 });
