@@ -4,11 +4,13 @@ export default class Task {
     private id: number;
     private content: string;
     private start: Date;
+    private end: Date | null;
 
-    constructor(content: string, start: Date | null, id: number | null) {
+    constructor(content: string, start: Date | null, end: Date | null, id: number | null) {
         this.id = id !== null ? id : lastId++;
         this.content = content;
         this.start = start ? start : new Date();
+        this.end = end;
     }
 
     getId(): number {
@@ -31,6 +33,10 @@ export default class Task {
         this.start = start;
     }
 
+    getEnd(): Date | null {
+        return this.end;
+    }
+
     toString(): string {
         return JSON.stringify(this);
     }
@@ -41,6 +47,7 @@ export default class Task {
         return new Task(
             data.content,
             new Date(data.start),
+            data.end ? new Date(data.end) : null,
             data.id
         );
     }

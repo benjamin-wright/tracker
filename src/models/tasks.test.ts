@@ -28,11 +28,11 @@ describe('tasks', () => {
             {
                 name: 'it should add a task',
                 tasks: () => [
-                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), null)
+                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), null, null)
                 ],
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "2",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11"})
@@ -41,11 +41,11 @@ describe('tasks', () => {
             {
                 name: 'should add a task with an id',
                 tasks: () => [
-                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), 12)
+                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), null, 12)
                 ],
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 12, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 12, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "1",
                     "planner-lookup": JSON.stringify({"12": "2022-7-11"})
@@ -54,15 +54,15 @@ describe('tasks', () => {
             {
                 name: 'should add a task with an id between auto-incremented tasks',
                 tasks: () => [
-                    new Task("first task", new Date("2022-07-12T12:34:56.000Z"), null),
-                    new Task("second task", new Date("2022-07-12T12:45:56.000Z"), 12),
-                    new Task("third task", new Date("2022-07-12T12:50:56.000Z"), null)
+                    new Task("first task", new Date("2022-07-12T12:34:56.000Z"), null, null),
+                    new Task("second task", new Date("2022-07-12T12:45:56.000Z"), null, 12),
+                    new Task("third task", new Date("2022-07-12T12:50:56.000Z"), null, null)
                 ],
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z") }),
-                        JSON.stringify({ id: 12, content: "second task", start: new Date("2022-07-12T12:45:56.000Z") }),
-                        JSON.stringify({ id: 2, content: "third task", start: new Date("2022-07-12T12:50:56.000Z") })
+                        JSON.stringify({ id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z"), end: null }),
+                        JSON.stringify({ id: 12, content: "second task", start: new Date("2022-07-12T12:45:56.000Z"), end: null }),
+                        JSON.stringify({ id: 2, content: "third task", start: new Date("2022-07-12T12:50:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "3",
                     "planner-lookup": JSON.stringify({
@@ -75,15 +75,15 @@ describe('tasks', () => {
             {
                 name: 'should sort by date when added out of sequence',
                 tasks: () => [
-                    new Task("first task", new Date("2022-07-12T12:34:56.000Z"), null),
-                    new Task("third task", new Date("2022-07-12T12:50:56.000Z"), null),
-                    new Task("second task", new Date("2022-07-12T12:45:56.000Z"), null)
+                    new Task("first task", new Date("2022-07-12T12:34:56.000Z"), null, null),
+                    new Task("third task", new Date("2022-07-12T12:50:56.000Z"), null, null),
+                    new Task("second task", new Date("2022-07-12T12:45:56.000Z"), null, null)
                 ],
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z") }),
-                        JSON.stringify({ id: 3, content: "second task", start: new Date("2022-07-12T12:45:56.000Z") }),
-                        JSON.stringify({ id: 2, content: "third task", start: new Date("2022-07-12T12:50:56.000Z") })
+                        JSON.stringify({ id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z"), end: null }),
+                        JSON.stringify({ id: 3, content: "second task", start: new Date("2022-07-12T12:45:56.000Z"), end: null }),
+                        JSON.stringify({ id: 2, content: "third task", start: new Date("2022-07-12T12:50:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "4",
                     "planner-lookup": JSON.stringify({
@@ -96,15 +96,15 @@ describe('tasks', () => {
             {
                 name: 'should split out tasks by week',
                 tasks: () => [
-                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), null),
-                    new Task("second task", new Date("2022-07-06T13:50:56.000Z"), null)
+                    new Task("a task", new Date("2022-07-12T12:34:56.000Z"), null, null),
+                    new Task("second task", new Date("2022-07-06T13:50:56.000Z"), null, null)
                 ],
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-key-2022-7-4": JSON.stringify([
-                        JSON.stringify({ id: 2, content: "second task", start: new Date("2022-07-06T13:50:56.000Z") })
+                        JSON.stringify({ id: 2, content: "second task", start: new Date("2022-07-06T13:50:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "3",
                     "planner-lookup": JSON.stringify({
@@ -132,15 +132,15 @@ describe('tasks', () => {
                 name: 'it should update a task',
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "2",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11"})
                 },
-                task: () => new Task("new task", new Date("2022-07-12T13:34:56.000Z"), 1),
+                task: () => new Task("new task", new Date("2022-07-12T13:34:56.000Z"), null, 1),
                 expected: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "new task", start: new Date("2022-07-12T13:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "new task", start: new Date("2022-07-12T13:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "2",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11"})
@@ -150,15 +150,15 @@ describe('tasks', () => {
                 name: 'it should move a task between weeks',
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "2",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11"})
                 },
-                task: () => new Task("new task", new Date("2022-07-06T13:34:56.000Z"), 1),
+                task: () => new Task("new task", new Date("2022-07-06T13:34:56.000Z"), null, 1),
                 expected: {
                     "planner-key-2022-7-4": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "new task", start: new Date("2022-07-06T13:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "new task", start: new Date("2022-07-06T13:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "2",
                     "planner-lookup": JSON.stringify({"1": "2022-7-4"})
@@ -168,17 +168,17 @@ describe('tasks', () => {
                 name: 'it should sort after an update',
                 store: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") }),
-                        JSON.stringify({ id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z") })
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null }),
+                        JSON.stringify({ id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "3",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11", "2": "2022-7-11"})
                 },
-                task: () => new Task("should be first", new Date("2022-07-11T12:34:56.000Z"), 2),
+                task: () => new Task("should be first", new Date("2022-07-11T12:34:56.000Z"), null, 2),
                 expected: {
                     "planner-key-2022-7-11": JSON.stringify([
-                        JSON.stringify({ id: 2, content: "should be first", start: new Date("2022-07-11T12:34:56.000Z") }),
-                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z") })
+                        JSON.stringify({ id: 2, content: "should be first", start: new Date("2022-07-11T12:34:56.000Z"), end: null }),
+                        JSON.stringify({ id: 1, content: "a task", start: new Date("2022-07-12T12:34:56.000Z"), end: null })
                     ]),
                     "planner-last-id": "3",
                     "planner-lookup": JSON.stringify({"1": "2022-7-11", "2": "2022-7-11"})
@@ -234,8 +234,8 @@ describe('tasks', () => {
                     "planner-lookup": JSON.stringify({"1": "2022-7-11", "2": "2022-7-11", "3": "2022-7-4"})
                 },
                 expected: [
-                    { id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z") },
-                    { id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z") },
+                    { id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z"), end: null },
+                    { id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z"), end: null },
                 ]
             },
             {
@@ -256,9 +256,9 @@ describe('tasks', () => {
                     "planner-lookup": JSON.stringify({"1": "2022-7-11", "2": "2022-7-11", "3": "2022-7-4"})
                 },
                 expected: [
-                    { id: 3, content: "third task", start: new Date("2022-07-06T12:34:56.000Z") },
-                    { id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z") },
-                    { id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z") },
+                    { id: 3, content: "third task", start: new Date("2022-07-06T12:34:56.000Z"), end: null },
+                    { id: 1, content: "first task", start: new Date("2022-07-12T12:34:56.000Z"), end: null },
+                    { id: 2, content: "second task", start: new Date("2022-07-13T12:34:56.000Z"), end: null },
                 ]
             }
         ].forEach(test => {

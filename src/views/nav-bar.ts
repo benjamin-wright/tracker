@@ -5,7 +5,7 @@ export default class NavBar {
     private newActivityCallback: () => void = () => {};
 
     constructor(doc: Document) {
-        this.newActivityButton = find.byId(doc, "new-activity");
+        this.newActivityButton = find.byId(doc.body, "new-activity");
 
         this.newActivityButton.onclick = () => { this.newActivityCallback(); }
     }

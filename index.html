@@ -15,8 +15,8 @@
     <noscript>
       <p>This page does not work without Javascript support, please check your browser settings!</p>
     </noscript>
-    <section id="planner" class="grow">
 
+    <section id="planner" class="grow">
       <!-- Planner headers and columns -->
       <template id="header-tpl">
         <div class="header-col">
@@ -33,11 +33,11 @@
         </div>
       </template>
       <div id="planner-tasks" class="overlay"></div>
-
     </section>
-    <section id="new-action-prompt" hidden>
+
+    <section id="new-task-prompt" hidden>
       <form id="new-task-form">
-        <input id="task-id" type="text" hidden/>
+        <input id="new-task-id" type="text" hidden/>
 
         <div class="right">
           <button type="reset">X</button>
@@ -45,17 +45,65 @@
 
         <fieldset>
           <label>Task: </label>
-          <input type="text" placeholder="description" id="task-description" required />
+          <input type="text" placeholder="description" id="new-task-description" required />
         </fieldset>
 
         <fieldset>
           <label>Start: </label>
-          <input type="datetime-local" id="task-start-date" required />
+          <input type="datetime-local" id="new-task-start-date" required />
         </fieldset>
 
         <div>
           <button type="submit">OK</button>
-          <button type="submit" id="task-delete" class="delete" hidden>Delete</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="update-task-prompt" hidden>
+      <form id="update-task-form">
+        <input id="update-task-id" type="text" hidden/>
+
+        <div class="right">
+          <button type="reset">X</button>
+        </div>
+
+        <fieldset>
+          <label>Task: </label>
+          <input type="text" placeholder="description" id="update-task-description" required />
+        </fieldset>
+
+        <fieldset>
+          <label>Start: </label>
+          <input type="datetime-local" id="update-task-start-date" required />
+        </fieldset>
+
+        <fieldset class="end-date">
+          <label>End: </label>
+          <input type="datetime-local" id="update-task-end-date" />
+        </fieldset>
+
+        <div>
+          <button type="submit">OK</button>
+          <button type="submit" id="update-task-delete" class="delete">Delete</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="end-task-prompt" hidden>
+      <form id="end-task-form">
+        <input id="end-task-id" type="text" hidden/>
+
+        <div class="right">
+          <button type="reset">X</button>
+        </div>
+
+        <fieldset>
+          <label>End: </label>
+          <input type="datetime-local" id="end-task-end-date" />
+        </fieldset>
+
+        <div>
+          <button type="submit">OK</button>
         </div>
       </form>
     </section>

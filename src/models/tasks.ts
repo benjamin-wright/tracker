@@ -1,20 +1,16 @@
 import PlannerDate from "../utils/planner-date";
 import Task from "../utils/task";
 import { toWeekString } from "../utils/date";
+import TaskPersistence from "./task-persistence";
 
 export default class Tasks {
     private days: PlannerDate[];
-    private tasks: { [key: string]: Task[] };
-    private lookup: { [key: number]: string };
-    private changes: string[];
-    private storage: Storage;
+    private store: TaskPersistence;
 
-    constructor(storage: Storage, days: PlannerDate[]) {
+
+    private constructor(store: TaskPersistence, days: PlannerDate[]) {
         this.days = days;
-        this.tasks = {};
-        this.lookup = {};
-        this.storage = storage;
-        this.changes = [];
+        this.store = store;
     }
 
     getDays(): PlannerDate[] {
@@ -38,9 +34,6 @@ export default class Tasks {
     updateTask(task: Task) {
         console.debug(`updating task ${task.getId()}`);
         const key = toWeekString(task.getStart());
-
-        console.log(this.lookup);
-        console.log(task);
 
         if (key !== this.lookup[task.getId()]) {
             this.removeTask(task.getId());

@@ -22,6 +22,11 @@ export default class PlannerDate {
     static ThisWeek(): PlannerDate[] {
         let day = new Date();
 
+        // if it's sunday then jump back a day, so that weeks run from mon -> sun instead of sun -> sat
+        if (day.getDay() === 0) {
+            day.setDate(day.getDate() - 1);
+        }
+
         // wind back to the 0th day (sunday)
         while (day.getDay() > 0) {
             day.setDate(day.getDate() - 1);
