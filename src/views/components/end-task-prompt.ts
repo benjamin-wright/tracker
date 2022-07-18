@@ -2,7 +2,7 @@ import { toRFC3339String } from '../../utils/date';
 import * as find from '../../utils/find';
 import Task from '../../utils/task';
 
-export default class NewTaskPrompt {
+export default class EndTaskPrompt {
     private section: HTMLElement;
     private form: HTMLFormElement;
     private taskDescription: HTMLInputElement;

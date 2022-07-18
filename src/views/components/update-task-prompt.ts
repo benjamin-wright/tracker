@@ -28,8 +28,8 @@ export default class UpdateTaskPrompt {
             const task = new Task(
                 this.taskDescription.value,
                 new Date(this.taskStartDate.value),
-                this.taskEndDate.value ? new Date(this.taskEndDate.value) : null,
-                this.taskId.value ? parseInt(this.taskId.value) : null
+                this.taskEndDate.value ? new Date(this.taskEndDate.value) : undefined,
+                this.taskId.value ? parseInt(this.taskId.value) : undefined
             );
 
             if (ev.submitter == this.taskDelete) {
@@ -55,7 +55,7 @@ export default class UpdateTaskPrompt {
     }
 
     open(t: Task) {
-        this.taskId.value = t.getId().toFixed(0);
+        this.taskId.value = t.getId()?.toFixed(0) || "";
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
 

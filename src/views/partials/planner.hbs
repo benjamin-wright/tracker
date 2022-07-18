@@ -1,0 +1,20 @@
+<section id="planner">
+  <!-- Planner headers and columns -->
+  <template id="header-tpl">
+    <div class="header-col">
+      <p></p>
+    </div>
+  </template>
+  <div id="planner-background" class="week"></div>
+
+  <!-- Task plotting overlay -->
+  <template id="task-tpl">
+    <div class="task started">
+      <p></p>
+      <button>x</button>
+    </div>
+  </template>
+  <div id="planner-tasks" class="overlay"></div>
+</section>
+
+{{> new-task-prompt }}

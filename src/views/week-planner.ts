@@ -11,6 +11,7 @@ export default class WeekPlanner {
     private tasks: HTMLElement;
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
+    private taskList: HTMLElement[];
 
     newTaskPrompt: NewTaskPrompt;
     updateTaskPrompt: UpdateTaskPrompt;
@@ -20,8 +21,9 @@ export default class WeekPlanner {
         this.tasks = find.byId(body, "planner-tasks");
         this.headerTemplate = find.templateById(body, "header-tpl");
         this.taskTemplate = find.templateById(body, "task-tpl");
-        this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"))
-        this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"))
+        this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"));
+        this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"));
+        this.taskList = [];
     }
 
     async render(days: PlannerDate[], tasks: Task[]) {
@@ -29,7 +31,9 @@ export default class WeekPlanner {
 
         this.clear();
         this.headers.append(...this.makeHeaders(days));
-        this.tasks.append(...this.makeTasks(days, tasks));
+
+        this.taskList = this.makeTasks(days, tasks);
+        this.tasks.append(...this.taskList);
     }
 
     clear() {
@@ -40,6 +44,10 @@ export default class WeekPlanner {
         while (this.tasks.firstChild) {
             this.tasks.removeChild(this.tasks.firstChild);
         }
+    }
+
+    unfocus() {
+        this.taskList.forEach(t => t.classList.remove("focus"));
     }
 
     private makeHeaders(days: PlannerDate[]): Node[] {
@@ -64,13 +72,13 @@ export default class WeekPlanner {
         });
     }
 
-    private makeTasks(days: PlannerDate[], tasks: Task[]): Node[] {
+    private makeTasks(days: PlannerDate[], tasks: Task[]): HTMLElement[] {
         let today = days.findIndex(d => d.isToday(new Date()));
         if (today == -1) {
             today = days.length - 1;
         }
 
-        return tasks.reduce<Node[]>((accumulator: Node[], t: Task) => {
+        return tasks.reduce<HTMLElement[]>((accumulator: HTMLElement[], t: Task) => {
             if (!this.taskTemplate.content.firstElementChild) {
                 console.error("header template did not contain a valid HTML element");
                 return accumulator;
@@ -103,7 +111,13 @@ export default class WeekPlanner {
 
             task.onclick = (event) => {
                 event.cancelBubble = true;
-                this.updateTaskPrompt.open(t);
+
+                if (task.classList.contains("focus")) {
+                    this.updateTaskPrompt.open(t);
+                } else {
+                    this.taskList.forEach(t => t.classList.remove("focus"));
+                    task.classList.add("focus");
+                }
             };
 
             const endButton = task.querySelector("button");

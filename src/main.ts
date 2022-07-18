@@ -5,37 +5,41 @@ import Task from "./utils/task";
 import NavBar from "./views/nav-bar";
 import WeekPlanner from "./views/week-planner";
 
-const navBar = new NavBar(document);
-const planner = new WeekPlanner(document.body);
+const start = async () => {
+    const navBar = new NavBar(document);
+    const planner = new WeekPlanner(document.body);
+    const days = PlannerDate.ThisWeek();
 
-const tasks = new Tasks(window.localStorage, PlannerDate.ThisWeek());
-tasks.load();
-Tasks.getDatabase(window.indexedDB, "tasks");
+    const tasks = await Tasks.create(window.indexedDB);
+    const render = async () => {
+        planner.render(days, await tasks.getTasks(days));
+    }
 
-const render = () => {
-    planner.render(tasks.getDays(), tasks.getTasks());
-}
+    navBar.onNewActivity(() => {
+        planner.newTaskPrompt.open();
+    });
+    
+    planner.newTaskPrompt.onNew(async (t: Task) => {
+        await tasks.addTask(t);
+        await render();
+    });
+    
+    planner.updateTaskPrompt.onUpdate(async (t: Task) => {
+        await tasks.updateTask(t);
+        await render();
+    });
+    
+    planner.updateTaskPrompt.onDelete(async (t: Task) => {
+        await tasks.removeTask(t);
+        await render();
+    });
 
-render();
+    document.onclick = () => {
+        planner.unfocus();
+    }
 
-navBar.onNewActivity(() => {
-    planner.newTaskPrompt.open();
-});
+    await render();
+};
 
-planner.newTaskPrompt.onNew((t: Task) => {
-    tasks.addTask(t);
-    tasks.save();
-    render();
-});
+start();
 
-planner.updateTaskPrompt.onUpdate((t: Task) => {
-    tasks.updateTask(t);
-    tasks.save();
-    render();
-});
-
-planner.updateTaskPrompt.onDelete((t: Task) => {
-    tasks.removeTask(t.getId());
-    tasks.save();
-    render();
-});

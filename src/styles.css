@@ -23,6 +23,9 @@ html, body {
 body {
     color: var(--main-fg-color);
     background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
 }
