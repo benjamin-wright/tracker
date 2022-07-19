@@ -9,6 +9,7 @@ export default class UpdateTaskPrompt {
     private taskDescription: HTMLInputElement;
     private taskStartDate: HTMLInputElement;
     private taskEndDate: HTMLInputElement;
+    private taskEndDateFieldset: HTMLFieldSetElement;
     private taskDelete: HTMLInputElement;
     private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
     private deleteTaskCallback: (t: Task) => void = (_t: Task) => {};
@@ -16,10 +17,11 @@ export default class UpdateTaskPrompt {
     constructor(section: HTMLElement) {
         this.section = section;
         this.form = find.byId(section, "update-task-form");
-        this.taskDescription = find.byId(section, "update-task-description") as HTMLInputElement;
-        this.taskStartDate = find.byId(section, "update-task-start-date") as HTMLInputElement;
-        this.taskEndDate = find.byId(section, "update-task-end-date") as HTMLInputElement;
-        this.taskDelete = find.byId(section, "update-task-delete") as HTMLInputElement;
+        this.taskDescription = find.byId(section, "update-task-description");
+        this.taskStartDate = find.byId(section, "update-task-start-date");
+        this.taskEndDate = find.byId(section, "update-task-end-date");
+        this.taskEndDateFieldset = find.byId(section, "update-task-end-date-fieldset");
+        this.taskDelete = find.byId(section, "update-task-delete");
 
         this.form.onsubmit = (ev: SubmitEvent) => {
             ev.preventDefault();
@@ -62,6 +64,12 @@ export default class UpdateTaskPrompt {
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
 
+        const end = t.getEnd();
+        if (end) {
+            this.taskEndDate.value = toRFC3339String(end);
+            this.taskEndDateFieldset.classList.remove("hidden");
+        }
+
         this.section.hidden = false;
         this.section.classList.add("popup");
     }
@@ -70,7 +78,9 @@ export default class UpdateTaskPrompt {
         this.task = undefined;
         this.taskDescription.value = "";
         this.taskStartDate.value = "";
+        this.taskEndDate.value = "";
 
+        this.taskEndDateFieldset.classList.add("hidden");
         this.section.hidden = true;
         this.section.classList.remove("popup");
     }

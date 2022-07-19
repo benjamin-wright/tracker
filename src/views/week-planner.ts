@@ -87,10 +87,18 @@ export default class WeekPlanner {
                 return accumulator;
             }
 
-            const day = days.findIndex(d => d.isToday(t.getStart()));
-            if (day == -1) {
+            const startDay = days.findIndex(d => d.isToday(t.getStart()));
+            if (startDay == -1) {
                 console.error(`task ${t.getContent()} was not in the current week: ${t.getStart().toString()}`);
                 return accumulator
+            }
+
+            let endDay = days.findIndex(d => {
+                const end = t.getEnd();
+                return end !== undefined && d.isToday(end)
+            });
+            if (endDay == -1) {
+                endDay = today;
             }
 
             const task = <HTMLDivElement>this.taskTemplate.content.firstElementChild.cloneNode(true);
@@ -103,8 +111,8 @@ export default class WeekPlanner {
 
             para.innerHTML = t.getContent();
 
-            const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
-            const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
+            const startLocation = (startDay + days[startDay].getDayFraction(t.getStart())) / days.length;
+            const endLocation = 1 - ((endDay + days[endDay].getDayFraction(t.getEnd() || new Date())) / days.length);
             const taskLength = (1 - endLocation - startLocation);
 
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;

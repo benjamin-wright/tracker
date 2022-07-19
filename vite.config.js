@@ -3,7 +3,11 @@ import handlebars from 'vite-plugin-handlebars';
 
 export default {
     build: {
-        sourcemap: true
+        sourcemap: true,
+        watch: {
+            exclude: 'node_modules/**',
+            include: 'src/**'
+        },
     },
     plugins: [
         handlebars({
