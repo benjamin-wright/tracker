@@ -64,7 +64,6 @@ export default class UpdateTaskPrompt {
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
 
-        console.log(t.getEnd());
         const end = t.getEnd();
         if (end) {
             this.taskEndDate.value = toRFC3339String(end);

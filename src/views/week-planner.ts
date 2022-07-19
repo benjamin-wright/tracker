@@ -1,5 +1,6 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
+import * as date from '../utils/date';
 import PlannerDate from '../utils/planner-date';
 import Task from '../models/task';
 import EndTaskPrompt from './components/end-task-prompt';
@@ -66,7 +67,7 @@ export default class WeekPlanner {
                 throw new Error("expected header template to contain a paragraph!");
             }
 
-            para.innerHTML = day.toShortDay();
+            para.innerHTML = `${day.toShortDay()} ${day.toNumber()}`;
             para.title = day.toString();
 
             header.title = day.toString();

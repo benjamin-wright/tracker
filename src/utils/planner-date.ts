@@ -1,3 +1,5 @@
+import { getDaySuffix } from "./date";
+
 const DAYS_MAP_SHORT = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
 
 const DAY_START_TIME = 9;
@@ -57,6 +59,10 @@ export default class PlannerDate {
 
     toShortDay(): string {
         return DAYS_MAP_SHORT[this.date.getDay()];
+    }
+
+    toNumber(): string {
+        return this.date.getDate().toFixed(0)+getDaySuffix(this.date.getDate());
     }
 
     toString(): string {
