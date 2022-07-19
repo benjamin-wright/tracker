@@ -3,12 +3,12 @@ import * as find from '../../utils/find';
 import Task from '../../utils/task';
 
 export default class UpdateTaskPrompt {
+    private task: Task | undefined;
     private section: HTMLElement;
     private form: HTMLFormElement;
     private taskDescription: HTMLInputElement;
     private taskStartDate: HTMLInputElement;
     private taskEndDate: HTMLInputElement;
-    private taskId: HTMLInputElement;
     private taskDelete: HTMLInputElement;
     private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
     private deleteTaskCallback: (t: Task) => void = (_t: Task) => {};
@@ -19,30 +19,33 @@ export default class UpdateTaskPrompt {
         this.taskDescription = find.byId(section, "update-task-description") as HTMLInputElement;
         this.taskStartDate = find.byId(section, "update-task-start-date") as HTMLInputElement;
         this.taskEndDate = find.byId(section, "update-task-end-date") as HTMLInputElement;
-        this.taskId = find.byId(section, "update-task-id") as HTMLInputElement;
         this.taskDelete = find.byId(section, "update-task-delete") as HTMLInputElement;
 
         this.form.onsubmit = (ev: SubmitEvent) => {
             ev.preventDefault();
 
-            const task = new Task(
-                this.taskDescription.value,
-                new Date(this.taskStartDate.value),
-                this.taskEndDate.value ? new Date(this.taskEndDate.value) : undefined,
-                this.taskId.value ? parseInt(this.taskId.value) : undefined
-            );
-
-            if (ev.submitter == this.taskDelete) {
-                this.deleteTaskCallback(task);
-            } else {
-                this.updateTaskCallback(task);
+            if (this.task === undefined) {
+                console.error("couldn't update task, task was undefined");
+                return;
             }
 
-            this.closePopup();
+            this.task.setContent(this.taskDescription.value);
+            this.task.setStart(new Date(this.taskStartDate.value));
+            if (this.taskEndDate.value) {
+                this.task.setEnd(new Date(this.taskEndDate.value));
+            }
+
+            if (ev.submitter == this.taskDelete) {
+                this.deleteTaskCallback(this.task);
+            } else {
+                this.updateTaskCallback(this.task);
+            }
+
+            this.close();
         };
 
         this.form.onreset = (_: Event) => {
-            this.closePopup();
+            this.close();
         };
     }
 
@@ -55,7 +58,7 @@ export default class UpdateTaskPrompt {
     }
 
     open(t: Task) {
-        this.taskId.value = t.getId()?.toFixed(0) || "";
+        this.task = t;
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
 
@@ -63,8 +66,8 @@ export default class UpdateTaskPrompt {
         this.section.classList.add("popup");
     }
 
-    closePopup() {
-        this.taskId.value = "";
+    close() {
+        this.task = undefined;
         this.taskDescription.value = "";
         this.taskStartDate.value = "";
 

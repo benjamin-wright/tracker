@@ -2,6 +2,7 @@ import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
 import PlannerDate from '../utils/planner-date';
 import Task from '../utils/task';
+import EndTaskPrompt from './components/end-task-prompt';
 import NewTaskPrompt from './components/new-task-prompt';
 import UpdateTaskPrompt from './components/update-task-prompt';
 import './planner.css';
@@ -15,6 +16,7 @@ export default class WeekPlanner {
 
     newTaskPrompt: NewTaskPrompt;
     updateTaskPrompt: UpdateTaskPrompt;
+    endTaskPrompt: EndTaskPrompt;
 
     constructor(body: HTMLElement) {
         this.headers = find.byId(body, "planner-background");
@@ -23,6 +25,7 @@ export default class WeekPlanner {
         this.taskTemplate = find.templateById(body, "task-tpl");
         this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"));
         this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"));
+        this.endTaskPrompt = new EndTaskPrompt(find.byId(body, "end-task-prompt"));
         this.taskList = [];
     }
 
@@ -102,10 +105,11 @@ export default class WeekPlanner {
 
             const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
             const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
+            const taskLength = (1 - endLocation - startLocation);
 
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
-            task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
-            if (t.getEnd() !== null) {
+            task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%; min-width:${taskLength * 100}%`);
+            if (t.isEnded()) {
                 task.classList.add("complete");
             }
 
@@ -128,7 +132,7 @@ export default class WeekPlanner {
 
             endButton.onclick = (event) => {
                 event.cancelBubble = true;
-                console.log("clicked stop");
+                this.endTaskPrompt.open(t);
             }
 
             accumulator.push(task);

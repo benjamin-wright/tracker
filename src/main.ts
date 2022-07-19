@@ -18,19 +18,24 @@ const start = async () => {
     navBar.onNewActivity(() => {
         planner.newTaskPrompt.open();
     });
-    
+
     planner.newTaskPrompt.onNew(async (t: Task) => {
         await tasks.addTask(t);
         await render();
     });
-    
+
     planner.updateTaskPrompt.onUpdate(async (t: Task) => {
         await tasks.updateTask(t);
         await render();
     });
-    
+
     planner.updateTaskPrompt.onDelete(async (t: Task) => {
         await tasks.removeTask(t);
+        await render();
+    });
+
+    planner.endTaskPrompt.onEnd(async (t: Task) => {
+        await tasks.updateTask(t);
         await render();
     });
 

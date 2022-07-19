@@ -7,7 +7,6 @@ export default class NewTaskPrompt {
     private form: HTMLFormElement;
     private taskDescription: HTMLInputElement;
     private taskStartDate: HTMLInputElement;
-    private taskId: HTMLInputElement;
     private callback: (t: Task) => void = (_t: Task) => {};
 
     constructor(section: HTMLElement) {
@@ -15,7 +14,6 @@ export default class NewTaskPrompt {
         this.form = find.byId(section, "new-task-form");
         this.taskDescription = find.byId(section, "new-task-description");
         this.taskStartDate = find.byId(section, "new-task-start-date");
-        this.taskId = find.byId(section, "new-task-id");
 
         this.form.onsubmit = (ev: SubmitEvent) => {
             ev.preventDefault();
@@ -24,7 +22,7 @@ export default class NewTaskPrompt {
                 this.taskDescription.value,
                 new Date(this.taskStartDate.value),
                 undefined,
-                this.taskId.value ? parseInt(this.taskId.value) : undefined
+                undefined
             );
 
             this.callback(task);
@@ -47,7 +45,6 @@ export default class NewTaskPrompt {
     }
 
     close() {
-        this.taskId.value = "";
         this.taskDescription.value = "";
         this.taskStartDate.value = "";
         this.section.hidden = true;

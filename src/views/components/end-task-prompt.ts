@@ -3,31 +3,28 @@ import * as find from '../../utils/find';
 import Task from '../../utils/task';
 
 export default class EndTaskPrompt {
+    private task: Task | undefined;
     private section: HTMLElement;
     private form: HTMLFormElement;
-    private taskDescription: HTMLInputElement;
-    private taskStartDate: HTMLInputElement;
-    private taskId: HTMLInputElement;
-    private callback: (t: Task) => void = (_t: Task) => {};
+    private taskEndDate: HTMLInputElement;
+    private callback: (t: Task) => void = () => {};
 
     constructor(section: HTMLElement) {
         this.section = section;
-        this.form = find.byId(section, "new-task-form");
-        this.taskDescription = find.byId(section, "new-task-description");
-        this.taskStartDate = find.byId(section, "new-task-start-date");
-        this.taskId = find.byId(section, "new-task-id");
+        this.form = find.byId(section, "end-task-form");
+        this.taskEndDate = find.byId(section, "end-task-end-date");
 
         this.form.onsubmit = (ev: SubmitEvent) => {
             ev.preventDefault();
 
-            const task = new Task(
-                this.taskDescription.value,
-                new Date(this.taskStartDate.value),
-                undefined,
-                this.taskId.value ? parseInt(this.taskId.value) : undefined
-            );
+            if (this.task === undefined) {
+                console.error("Can't end task, task was not defined!")
+                return;
+            }
 
-            this.callback(task);
+            this.task.setEnd(new Date(this.taskEndDate.value))
+
+            this.callback(this.task);
             this.close();
         };
 
@@ -36,20 +33,20 @@ export default class EndTaskPrompt {
         };
     }
 
-    onNew(callback: (t: Task) => void) {
+    onEnd(callback: (task: Task) => void) {
         this.callback = callback;
     }
 
-    open() {
-        this.taskStartDate.value = toRFC3339String(new Date());
+    open(task: Task) {
+        this.task = task;
+        this.taskEndDate.value = toRFC3339String(new Date());
         this.section.hidden = false;
         this.section.classList.add("popup");
     }
 
     close() {
-        this.taskId.value = "";
-        this.taskDescription.value = "";
-        this.taskStartDate.value = "";
+        this.task = undefined;
+        this.taskEndDate.value = "";
         this.section.hidden = true;
         this.section.classList.remove("popup");
     }

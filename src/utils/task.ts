@@ -39,6 +39,14 @@ export default class Task {
         return this.end;
     }
 
+    setEnd(end: Date) {
+        this.end = end;
+    }
+
+    isEnded(): boolean {
+        return this.end !== undefined;
+    }
+
     serialize(): any {
         return {
             content: this.content,

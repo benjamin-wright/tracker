@@ -41,7 +41,7 @@
 .task {
     background-color: var(--main-fg-color);
     border: solid 1px var(--main-highlight-color);
-    border-radius: 0.25em;
+    border-radius: 0.25em 0 0 0.25em;
     color: var(--main-bg-color);
     margin: 0.5em 0;
     pointer-events: all;
@@ -64,6 +64,15 @@
     border-left: solid 0.3em var(--main-start-color);
 }
 
+.task.focus {
+    background-color: var(--main-highlight-color);
+}
+
+.task.complete {
+    border-right: solid 0.3em var(--main-end-color);
+    border-radius: 0.25em;
+}
+
 .task p {
     overflow: clip;
     white-space: nowrap;
@@ -78,12 +87,14 @@
     border: none;
     background-color: var(--main-neg-bg-color);
     color: var(--main-fg-color);
-    border-top-right-radius: 0.25em;
-    border-bottom-right-radius: 0.25em;
 }
 
 .task.focus button {
     display: block;
+}
+
+.task.focus.complete button {
+    display: none;
 }
 
 .task button:hover {

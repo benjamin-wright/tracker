@@ -18,54 +18,6 @@
 
     {{> planner }}
 
-    <section id="update-task-prompt" hidden>
-      <form id="update-task-form">
-        <input id="update-task-id" type="text" hidden/>
-
-        <div class="right">
-          <button type="reset">X</button>
-        </div>
-
-        <fieldset>
-          <label>Task: </label>
-          <input type="text" placeholder="description" id="update-task-description" required />
-        </fieldset>
-
-        <fieldset>
-          <label>Start: </label>
-          <input type="datetime-local" id="update-task-start-date" required />
-        </fieldset>
-
-        <fieldset class="end-date">
-          <label>End: </label>
-          <input type="datetime-local" id="update-task-end-date" />
-        </fieldset>
-
-        <div>
-          <button type="submit">OK</button>
-          <button type="submit" id="update-task-delete" class="delete">Delete</button>
-        </div>
-      </form>
-    </section>
-
-    <section id="end-task-prompt" hidden>
-      <form id="end-task-form">
-        <input id="end-task-id" type="text" hidden/>
-
-        <div class="right">
-          <button type="reset">X</button>
-        </div>
-
-        <fieldset>
-          <label>End: </label>
-          <input type="datetime-local" id="end-task-end-date" />
-        </fieldset>
-
-        <div>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-    </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
