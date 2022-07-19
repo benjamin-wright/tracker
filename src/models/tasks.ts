@@ -1,10 +1,11 @@
 import PlannerDate from "../utils/planner-date";
 import Task from "./task";
+import { THE_PAST, THE_FUTURE } from "./task";
 
 export default class Tasks {
     static create(indexedDB: IDBFactory): Promise<Tasks> {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open("tracker-tasks", 2);
+            const request = indexedDB.open("tracker-tasks", 1);
 
             request.onerror = event => {
                 reject(`Failed to open database with error: ${JSON.stringify(event.target)}`);
@@ -18,18 +19,8 @@ export default class Tasks {
                 console.debug('initialising database...');
                 const db = request.result;
 
-                let os: IDBObjectStore;
-
-                console.info(db);
-
-                if (db.version === 1) {
-                    os = db.transaction("tasks").objectStore("tasks");
-                } else {
-                    os = db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
-                    os.createIndex("start", "start", {unique: false});
-                }
-
-                os.createIndex("end", ["start", "end"], {unique: false});
+                const os = db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
+                os.createIndex("dates", ["start", "end"], {unique: false});
             };
 
             request.onsuccess = () => {
@@ -96,51 +87,28 @@ export default class Tasks {
         const transaction = this.database.transaction(["tasks"], "readonly");
         const store = transaction.objectStore("tasks");
 
-        const past = new Date("0000-01-01");
-        const future = new Date("9999-01-02");
         const start = days[0].getDate();
         const end = new Date(days[days.length - 1].getDate());
         end.setDate(end.getDate() + 1);
 
-        const startIndex = store.index("start");
-        const startRange = IDBKeyRange.bound(start, end);
-        const startQuery = startIndex.openCursor(startRange);
+        const index = store.index("dates");
+        const range = IDBKeyRange.bound([THE_PAST, start], [end, THE_FUTURE], true);
+        const query = index.openCursor(range);
 
-        const endIndex = store.index("end");
-        const endRange = IDBKeyRange.bound([past, start], [end, future], true, true);
-        const endQuery = endIndex.openCursor(endRange);
+        return new Promise<Task[]>((resolve, reject) => {
+            const tasks: Task[] = [];
 
-        return (await Promise.all([
-            new Promise<Task[]>((resolve, reject) => {
-                const tasks: Task[] = [];
-
-                startQuery.onerror = () => reject(new Error(`Failed to fetch start tasks: ${startQuery.error?.message}`));
-                startQuery.onsuccess = () => {
-                    const cursor = startQuery.result;
-                    if (cursor === null) {
-                        resolve(tasks);
-                        return;
-                    }
-
-                    tasks.push(Task.deserialize(cursor.value));
-                    cursor.continue();
+            query.onerror = () => reject(new Error(`Failed to fetch start tasks: ${query.error?.message}`));
+            query.onsuccess = () => {
+                const cursor = query.result;
+                if (cursor === null) {
+                    resolve(tasks);
+                    return;
                 }
-            }),
-            new Promise<Task[]>((resolve, reject) => {
-                const tasks: Task[] = [];
 
-                endQuery.onerror = () => reject(new Error(`Failed to fetch end tasks: ${endQuery.error?.message}`));
-                endQuery.onsuccess = () => {
-                    const cursor = endQuery.result;
-                    if (cursor === null) {
-                        resolve(tasks);
-                        return;
-                    }
-
-                    tasks.push(Task.deserialize(cursor.value));
-                    cursor.continue();
-                }
-            }),
-        ])).flat(1);
+                tasks.push(Task.deserialize(cursor.value));
+                cursor.continue();
+            }
+        })
     }
 }

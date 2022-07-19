@@ -64,6 +64,7 @@ export default class UpdateTaskPrompt {
         this.taskDescription.value = t.getContent();
         this.taskStartDate.value = toRFC3339String(t.getStart());
 
+        console.log(t.getEnd());
         const end = t.getEnd();
         if (end) {
             this.taskEndDate.value = toRFC3339String(end);
@@ -81,6 +82,9 @@ export default class UpdateTaskPrompt {
                 this.taskStartDate.setCustomValidity(message);
                 this.taskEndDate.setCustomValidity(message);
             }
+        } else {
+            this.taskEndDateFieldset.classList.add("hidden");
+            this.taskEndDate.value = "";
         }
 
         this.section.hidden = false;
@@ -93,7 +97,6 @@ export default class UpdateTaskPrompt {
         this.taskStartDate.value = "";
         this.taskEndDate.value = "";
 
-        this.taskEndDateFieldset.classList.add("hidden");
         this.section.hidden = true;
         this.section.classList.remove("popup");
     }

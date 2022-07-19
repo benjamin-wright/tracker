@@ -1,3 +1,6 @@
+export const THE_PAST = new Date("0000-01-01");
+export const THE_FUTURE = new Date("9999-01-02");
+
 export default class Task {
     private id: number | undefined;
     private content: string;
@@ -51,7 +54,7 @@ export default class Task {
         return {
             content: this.content,
             start: this.start,
-            ... this.end ? { end: this.end } : {},
+            end: this.end || THE_FUTURE,
             ... this.id ? { id: this.id } : {}
         }
     }
@@ -60,7 +63,7 @@ export default class Task {
         return new Task(
             data.content,
             data.start,
-            data.end,
+            (data.end as Date).getTime() == THE_FUTURE.getTime() ? undefined : data.end,
             data.id
         )
     }

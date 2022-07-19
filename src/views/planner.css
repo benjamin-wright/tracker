@@ -41,7 +41,6 @@
 .task {
     background-color: var(--main-fg-color);
     border: solid 1px var(--main-highlight-color);
-    border-radius: 0.25em 0 0 0.25em;
     color: var(--main-bg-color);
     margin: 0.5em 0;
     pointer-events: all;
@@ -62,6 +61,7 @@
 
 .task.started {
     border-left: solid 0.3em var(--main-start-color);
+    border-radius: 0.25em 0 0 0.25em;
 }
 
 .task.focus {
@@ -70,6 +70,10 @@
 
 .task.complete {
     border-right: solid 0.3em var(--main-end-color);
+    border-radius: 0 0.25em 0.25em 0;
+}
+
+.task.started.complete {
     border-radius: 0.25em;
 }
 
