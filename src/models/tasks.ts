@@ -109,6 +109,6 @@ export default class Tasks {
                 tasks.push(Task.deserialize(cursor.value));
                 cursor.continue();
             }
-        })
+        });
     }
 }
