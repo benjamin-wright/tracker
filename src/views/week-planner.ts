@@ -1,7 +1,7 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
 import PlannerDate from '../utils/planner-date';
-import Task from '../utils/task';
+import Task from '../models/task';
 import EndTaskPrompt from './components/end-task-prompt';
 import NewTaskPrompt from './components/new-task-prompt';
 import UpdateTaskPrompt from './components/update-task-prompt';
@@ -88,16 +88,14 @@ export default class WeekPlanner {
             }
 
             const startDay = days.findIndex(d => d.isToday(t.getStart()));
-            if (startDay == -1) {
-                console.error(`task ${t.getContent()} was not in the current week: ${t.getStart().toString()}`);
-                return accumulator
-            }
+            const beforeStart = startDay === -1;
 
             let endDay = days.findIndex(d => {
                 const end = t.getEnd();
                 return end !== undefined && d.isToday(end)
             });
-            if (endDay == -1) {
+            const afterEnd = t.getEnd() !== undefined && endDay === -1;
+            if (endDay === -1) {
                 endDay = today;
             }
 
@@ -111,13 +109,18 @@ export default class WeekPlanner {
 
             para.innerHTML = t.getContent();
 
-            const startLocation = (startDay + days[startDay].getDayFraction(t.getStart())) / days.length;
-            const endLocation = 1 - ((endDay + days[endDay].getDayFraction(t.getEnd() || new Date())) / days.length);
+            const startLocation = beforeStart ? 0 : (startDay + days[startDay].getDayFraction(t.getStart())) / days.length;
+            const endLocation = afterEnd ? 0 : 1 - ((endDay + days[endDay].getDayFraction(t.getEnd() || new Date())) / days.length);
             const taskLength = (1 - endLocation - startLocation);
 
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
             task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%; min-width:${taskLength * 100}%`);
-            if (t.isEnded()) {
+
+            if (!beforeStart) {
+                task.classList.add("started");
+            }
+
+            if (t.isEnded() && !afterEnd) {
                 task.classList.add("complete");
             }
 

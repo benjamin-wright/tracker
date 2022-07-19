@@ -1,6 +1,6 @@
 import { toRFC3339String } from '../../utils/date';
 import * as find from '../../utils/find';
-import Task from '../../utils/task';
+import Task from '../../models/task';
 
 export default class NewTaskPrompt {
     private section: HTMLElement;
