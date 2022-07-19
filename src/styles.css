@@ -5,6 +5,7 @@
     --main-highlight-color: rgb(133, 255, 237);
     --main-popup-bg-color: rgba(3, 11, 27, 0.926);
     --main-neg-bg-color: rgb(196, 160, 172);
+    --main-neg-highlight-color: red;
     --main-start-color: green;
     --main-end-color: red;
 }
@@ -22,6 +23,9 @@ html, body {
 body {
     color: var(--main-fg-color);
     background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
 }

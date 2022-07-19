@@ -51,5 +51,29 @@ describe('PlannerDate', () => {
                 new PlannerDate(2022, 5, 3),
             ]);
         });
+
+        it('should return the previous week on saturdays', () => {
+            jest.setSystemTime(new Date('2022-06-04T00:00:00.000Z'))
+
+            expect(PlannerDate.ThisWeek()).toEqual([
+                new PlannerDate(2022, 4, 30),
+                new PlannerDate(2022, 4, 31),
+                new PlannerDate(2022, 5, 1),
+                new PlannerDate(2022, 5, 2),
+                new PlannerDate(2022, 5, 3),
+            ]);
+        });
+        
+        it('should return the previous week on sundays', () => {
+            jest.setSystemTime(new Date('2022-06-05T00:00:00.000Z'))
+
+            expect(PlannerDate.ThisWeek()).toEqual([
+                new PlannerDate(2022, 4, 30),
+                new PlannerDate(2022, 4, 31),
+                new PlannerDate(2022, 5, 1),
+                new PlannerDate(2022, 5, 2),
+                new PlannerDate(2022, 5, 3),
+            ]);
+        });
     });
 });

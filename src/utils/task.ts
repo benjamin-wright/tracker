@@ -1,18 +1,22 @@
-let lastId = 1;
-
 export default class Task {
-    private id: number;
+    private id: number | undefined;
     private content: string;
     private start: Date;
+    private end: Date | undefined;
 
-    constructor(content: string, start: Date | null, id: number | null) {
-        this.id = id !== null ? id : lastId++;
+    constructor(content: string, start: Date | null, end: Date | undefined, id: number | undefined) {
+        this.id = id;
         this.content = content;
         this.start = start ? start : new Date();
+        this.end = end;
     }
 
-    getId(): number {
+    getId(): number | undefined {
         return this.id;
+    }
+
+    setId(id: number) {
+        this.id = id;
     }
 
     getContent(): string {
@@ -31,25 +35,33 @@ export default class Task {
         this.start = start;
     }
 
-    toString(): string {
-        return JSON.stringify(this);
+    getEnd(): Date | undefined {
+        return this.end;
     }
 
-    static fromString(value: string): Task {
-        const data = JSON.parse(value);
-        
+    setEnd(end: Date) {
+        this.end = end;
+    }
+
+    isEnded(): boolean {
+        return this.end !== undefined;
+    }
+
+    serialize(): any {
+        return {
+            content: this.content,
+            start: this.start,
+            ... this.end ? { end: this.end } : {},
+            ... this.id ? { id: this.id } : {}
+        }
+    }
+
+    static deserialize(data: any): Task {
         return new Task(
             data.content,
-            new Date(data.start),
+            data.start,
+            data.end,
             data.id
-        );
-    }
-
-    static setLastId(value: number) {
-        lastId = value;
-    }
-
-    static getLastID(): number {
-        return lastId;
+        )
     }
 }

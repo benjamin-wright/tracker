@@ -1,74 +1,32 @@
-import { toRFC3339String } from '../utils/date';
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
 import PlannerDate from '../utils/planner-date';
 import Task from '../utils/task';
+import EndTaskPrompt from './components/end-task-prompt';
+import NewTaskPrompt from './components/new-task-prompt';
+import UpdateTaskPrompt from './components/update-task-prompt';
 import './planner.css';
 
 export default class WeekPlanner {
     private headers: HTMLElement;
     private tasks: HTMLElement;
-    private popup: HTMLElement;
-    private newTaskForm: HTMLFormElement;
-    private taskDescription: HTMLInputElement;
-    private taskStartDate: HTMLInputElement;
-    private taskId: HTMLInputElement;
-    private taskDelete: HTMLInputElement;
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
-    private newTaskCallback: (t: Task) => void = (_t: Task) => {};
-    private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
-    private deleteTaskCallback: (t: Task) => void = (_t: Task) => {};
+    private taskList: HTMLElement[];
 
-    constructor(doc: Document) {
-        this.headers = find.byId(doc, "planner-background");
-        this.tasks = find.byId(doc, "planner-tasks");
-        this.popup = find.byId(doc, "new-action-prompt")
-        this.newTaskForm = find.byId(doc, "new-task-form") as HTMLFormElement;
-        this.taskDescription = find.byId(doc, "task-description") as HTMLInputElement;
-        this.taskStartDate = find.byId(doc, "task-start-date") as HTMLInputElement;
-        this.taskId = find.byId(doc, "task-id") as HTMLInputElement;
-        this.taskDelete = find.byId(doc, "task-delete") as HTMLInputElement;
-        this.headerTemplate = find.templateById(doc, "header-tpl");
-        this.taskTemplate = find.templateById(doc, "task-tpl");
+    newTaskPrompt: NewTaskPrompt;
+    updateTaskPrompt: UpdateTaskPrompt;
+    endTaskPrompt: EndTaskPrompt;
 
-        this.newTaskForm.onsubmit = (ev: SubmitEvent) => {
-            ev.preventDefault();
-
-            const task = new Task(
-                this.taskDescription.value,
-                new Date(this.taskStartDate.value),
-                this.taskId.value ? parseInt(this.taskId.value) : null
-            );
-
-            if (this.taskId.value === "") {
-                this.newTaskCallback(task);
-            } else {
-                if (ev.submitter == this.taskDelete) {
-                    this.deleteTaskCallback(task);
-                } else {
-                    this.updateTaskCallback(task);
-                }
-            }
-
-            this.closePopup();
-        };
-
-        this.newTaskForm.onreset = (_: Event) => {
-            this.closePopup();
-        };
-    }
-
-    onNewTask(callback: (t: Task) => void) {
-        this.newTaskCallback = callback;
-    }
-
-    onUpdateTask(callback: (t: Task) => void) {
-        this.updateTaskCallback = callback;
-    }
-
-    onDeleteTask(callback: (t: Task) => void) {
-        this.deleteTaskCallback = callback;
+    constructor(body: HTMLElement) {
+        this.headers = find.byId(body, "planner-background");
+        this.tasks = find.byId(body, "planner-tasks");
+        this.headerTemplate = find.templateById(body, "header-tpl");
+        this.taskTemplate = find.templateById(body, "task-tpl");
+        this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"));
+        this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"));
+        this.endTaskPrompt = new EndTaskPrompt(find.byId(body, "end-task-prompt"));
+        this.taskList = [];
     }
 
     async render(days: PlannerDate[], tasks: Task[]) {
@@ -76,7 +34,9 @@ export default class WeekPlanner {
 
         this.clear();
         this.headers.append(...this.makeHeaders(days));
-        this.tasks.append(...this.makeTasks(days, tasks));
+
+        this.taskList = this.makeTasks(days, tasks);
+        this.tasks.append(...this.taskList);
     }
 
     clear() {
@@ -87,6 +47,10 @@ export default class WeekPlanner {
         while (this.tasks.firstChild) {
             this.tasks.removeChild(this.tasks.firstChild);
         }
+    }
+
+    unfocus() {
+        this.taskList.forEach(t => t.classList.remove("focus"));
     }
 
     private makeHeaders(days: PlannerDate[]): Node[] {
@@ -111,13 +75,13 @@ export default class WeekPlanner {
         });
     }
 
-    private makeTasks(days: PlannerDate[], tasks: Task[]): Node[] {
+    private makeTasks(days: PlannerDate[], tasks: Task[]): HTMLElement[] {
         let today = days.findIndex(d => d.isToday(new Date()));
         if (today == -1) {
             today = days.length - 1;
         }
 
-        return tasks.reduce<Node[]>((accumulator: Node[], t: Task) => {
+        return tasks.reduce<HTMLElement[]>((accumulator: HTMLElement[], t: Task) => {
             if (!this.taskTemplate.content.firstElementChild) {
                 console.error("header template did not contain a valid HTML element");
                 return accumulator;
@@ -141,46 +105,39 @@ export default class WeekPlanner {
 
             const startLocation = (day + days[day].getDayFraction(t.getStart())) / days.length;
             const endLocation = 1 - ((today + days[today].getDayFraction(new Date())) / days.length);
+            const taskLength = (1 - endLocation - startLocation);
 
             task.title = `Task: ${t.getContent()}\nStart: ${t.getStart().toLocaleTimeString()}`;
-            task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%`);
+            task.setAttribute("style", `margin-left:${startLocation * 100}%;margin-right:${endLocation * 100}%; min-width:${taskLength * 100}%`);
+            if (t.isEnded()) {
+                task.classList.add("complete");
+            }
 
             task.onclick = (event) => {
-                event.preventDefault();
-                this.updateTask(t);
+                event.cancelBubble = true;
+
+                if (task.classList.contains("focus")) {
+                    this.updateTaskPrompt.open(t);
+                } else {
+                    this.taskList.forEach(t => t.classList.remove("focus"));
+                    task.classList.add("focus");
+                }
             };
+
+            const endButton = task.querySelector("button");
+            if (!endButton) {
+                console.error("expected task template to contain an end button!");
+                return accumulator;
+            }
+
+            endButton.onclick = (event) => {
+                event.cancelBubble = true;
+                this.endTaskPrompt.open(t);
+            }
 
             accumulator.push(task);
 
             return accumulator;
         }, []);
-    }
-
-    newTask() {
-        this.taskStartDate.value = toRFC3339String(new Date());
-
-        this.taskDelete.hidden = true;
-        this.popup.hidden = false;
-        this.popup.classList.add("popup");
-    }
-
-    updateTask(t: Task) {
-        this.taskId.value = t.getId().toFixed(0);
-        this.taskDescription.value = t.getContent();
-        this.taskStartDate.value = toRFC3339String(t.getStart());
-
-        this.taskDelete.hidden = false;
-        this.popup.hidden = false;
-        this.popup.classList.add("popup");
-    }
-
-    closePopup() {
-        this.taskId.value = "";
-        this.taskDescription.value = "";
-        this.taskStartDate.value = "";
-
-        this.popup.hidden = true;
-        this.taskDelete.hidden = true;
-        this.popup.classList.remove("popup");
     }
 }

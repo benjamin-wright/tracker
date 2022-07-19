@@ -1,18 +1,18 @@
-export function byId(doc: Document, id: string): HTMLElement {
-    const element = doc.getElementById(id);
-    if (element === null) {
+export function byId<T extends Element>(element: HTMLElement, id: string): T {
+    const elem = element.querySelector<T>("#"+id);
+    if (elem === null) {
         throw new Error(`Failed to find element by id: ${id}`);
     }
 
-    return element;
+    return elem;
 }
 
-export function templateById(doc: Document, id: string): HTMLTemplateElement {
-    const element = doc.querySelector<HTMLTemplateElement>("#"+id);
+export function templateById(element: HTMLElement, id: string): HTMLTemplateElement {
+    const elem = element.querySelector<HTMLTemplateElement>("#"+id);
 
-    if (element === null) {
+    if (elem === null) {
         throw new Error(`Failed to find template by id: ${id}`);
     }
 
-    return element;
+    return elem;
 }
