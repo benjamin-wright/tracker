@@ -1,10 +1,10 @@
 import PlannerDate from "../utils/planner-date";
-import Task from "../utils/task";
+import Task from "./task";
 
 export default class Tasks {
     static create(indexedDB: IDBFactory): Promise<Tasks> {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open("tracker-tasks", 1);
+            const request = indexedDB.open("tracker-tasks", 2);
 
             request.onerror = event => {
                 reject(`Failed to open database with error: ${JSON.stringify(event.target)}`);
@@ -17,8 +17,19 @@ export default class Tasks {
             request.onupgradeneeded = () => {
                 console.debug('initialising database...');
                 const db = request.result;
-                const os = db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
-                os.createIndex("start", "start", {unique: false});
+
+                let os: IDBObjectStore;
+
+                console.info(db);
+
+                if (db.version === 1) {
+                    os = db.transaction("tasks").objectStore("tasks");
+                } else {
+                    os = db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
+                    os.createIndex("start", "start", {unique: false});
+                }
+
+                os.createIndex("end", ["start", "end"], {unique: false});
             };
 
             request.onsuccess = () => {
@@ -68,13 +79,13 @@ export default class Tasks {
         const transaction = this.database.transaction(["tasks"], "readwrite");
         const store = transaction.objectStore("tasks");
 
-        const id = task.getId(); 
+        const id = task.getId();
         if (id === undefined) {
             return Promise.reject(new Error(`Can't delete task with null id: ${task.getContent()}`));
         }
 
         const request = store.delete(id);
-        
+
         return new Promise((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to delete task: ${request.error?.message}`));
             request.onsuccess = () => resolve();
@@ -84,157 +95,52 @@ export default class Tasks {
     async getTasks(days: PlannerDate[]): Promise<Task[]> {
         const transaction = this.database.transaction(["tasks"], "readonly");
         const store = transaction.objectStore("tasks");
-        const index = store.index("start");
 
+        const past = new Date("0000-01-01");
+        const future = new Date("9999-01-02");
         const start = days[0].getDate();
         const end = new Date(days[days.length - 1].getDate());
         end.setDate(end.getDate() + 1);
 
-        const range = IDBKeyRange.bound(start, end);
+        const startIndex = store.index("start");
+        const startRange = IDBKeyRange.bound(start, end);
+        const startQuery = startIndex.openCursor(startRange);
 
-        const query = index.openCursor(range);
+        const endIndex = store.index("end");
+        const endRange = IDBKeyRange.bound([past, start], [end, future], true, true);
+        const endQuery = endIndex.openCursor(endRange);
 
-        return new Promise((resolve, reject) => {
-            const tasks: Task[] = [];
+        return (await Promise.all([
+            new Promise<Task[]>((resolve, reject) => {
+                const tasks: Task[] = [];
 
-            query.onerror = () => reject(new Error(`Failed to fetch tasks: ${query.error?.message}`));
-            query.onsuccess = () => {
-                const cursor = query.result;
-                if (cursor === null) {
-                    resolve(tasks);
-                    return;
+                startQuery.onerror = () => reject(new Error(`Failed to fetch start tasks: ${startQuery.error?.message}`));
+                startQuery.onsuccess = () => {
+                    const cursor = startQuery.result;
+                    if (cursor === null) {
+                        resolve(tasks);
+                        return;
+                    }
+
+                    tasks.push(Task.deserialize(cursor.value));
+                    cursor.continue();
                 }
+            }),
+            new Promise<Task[]>((resolve, reject) => {
+                const tasks: Task[] = [];
 
-                tasks.push(Task.deserialize(cursor.value));
-                cursor.continue();
-            }
-        });
+                endQuery.onerror = () => reject(new Error(`Failed to fetch end tasks: ${endQuery.error?.message}`));
+                endQuery.onsuccess = () => {
+                    const cursor = endQuery.result;
+                    if (cursor === null) {
+                        resolve(tasks);
+                        return;
+                    }
+
+                    tasks.push(Task.deserialize(cursor.value));
+                    cursor.continue();
+                }
+            }),
+        ])).flat(1);
     }
-
-    // async getTask(id: number) {
-
-    //     console.debug(`getting task: ${task.getContent()}`);
-    //     const transaction = this.database.transaction(["tasks"], "readonly");
-    //     const store = transaction.objectStore("tasks");
-
-    //     const query = store.get(id);
-
-    //     return new Promise((resolve, reject) => {
-    //         query.onerror = () => {
-    //             reject(new Error(`Failed to insert task: ${query.error?.message}`));
-    //         };
-
-    //         query.onsuccess = () => {
-    //             task.setId(query.result as number);
-    //             resolve(task);
-    //         };
-    //     });
-    // }
 }
-
-// export default class Tasks {
-//     private days: PlannerDate[];
-
-
-//     private constructor(store: TaskPersistence, days: PlannerDate[]) {
-//         this.days = days;
-//         this.store = store;
-//     }
-
-//     getDays(): PlannerDate[] {
-//         return this.days;
-//     }
-
-
-//     updateTask(task: Task) {
-//         console.debug(`updating task ${task.getId()}`);
-//         const key = toWeekString(task.getStart());
-
-//         if (key !== this.lookup[task.getId()]) {
-//             this.removeTask(task.getId());
-//             this.addTask(task);
-//             return;
-//         }
-
-//         const original = this.tasks[key].find((t: Task) => t.getId() === task.getId());
-//         if (!original) {
-//             throw new Error(`failed to update task, couldn't find id ${task.getId()}`);
-//         }
-
-//         original.setContent(task.getContent());
-//         original.setStart(task.getStart());
-
-//         this.changes.push(key);
-//         this.sort(key);
-//     }
-
-//     removeTask(id: number) {
-//         console.debug(`removing task ${id}`);
-//         const key = this.lookup[id];
-
-//         const index = this.tasks[key].findIndex((t: Task) => t.getId() === id);
-//         if (index < 0) {
-//             throw new Error(`failed to remove task, couldn't find id ${id}`);
-//         }
-
-//         this.tasks[key].splice(index, 1);
-//         if (this.tasks[key].length === 0) {
-//             delete this.tasks[key];
-//         }
-
-//         delete this.lookup[id];
-//         this.changes.push(key);
-//     }
-
-//     getTasks(): Task[] {
-//         const keys: {[key: string]: boolean} = {};
-
-//         this.days.forEach((d: PlannerDate) => {
-//             const key = toWeekString(d.getDate());
-//             keys[key] = true;
-//         })
-
-//         return Object.keys(keys).filter((key: string) => this.tasks[key]).flatMap((key: string) => this.tasks[key]);
-//     }
-
-//     private sort(key: string) {
-//         this.tasks[key].sort((a: Task, b: Task) => Math.sign(a.getStart().getTime() - b.getStart().getTime()));
-//     }
-
-//     save() {
-//         console.debug('saving...');
-//         this.storage.setItem('planner-last-id', Task.getLastID().toFixed(0));
-//         this.storage.setItem('planner-lookup', JSON.stringify(this.lookup));
-        
-//         this.changes.forEach((key: string) => {
-//             if (this.tasks[key]) {
-//                 this.storage.setItem(`planner-key-${key}`, JSON.stringify(this.tasks[key].map((t: Task) => t.toString())));
-//             } else {
-//                 this.storage.removeItem(`planner-key-${key}`);
-//             }
-//         });
-
-//         this.changes = [];
-//     }
-
-//     load() {
-//         console.debug('saving...');
-//         Task.setLastId(JSON.parse(this.storage.getItem('planner-last-id') || "0"));
-//         this.lookup = JSON.parse(this.storage.getItem('planner-lookup') || "{}");
-        
-//         const length = this.storage.length;
-//         for (let index = 0; index < length; index++) {
-//             const key = this.storage.key(index);
-//             console.debug(`found key ${key}`);
-            
-//             if (!key?.startsWith("planner-key-")) {
-//                 continue;
-//             }
-
-//             const internalKey = key.replace("planner-key-", "");
-
-//             this.tasks[internalKey] = JSON.parse(this.storage.getItem(key) || "[]").map((t: string) => Task.fromString(t));
-//             console.debug(`loaded: ${JSON.stringify(this.tasks[internalKey])}`);
-//         }
-//     }
-// }

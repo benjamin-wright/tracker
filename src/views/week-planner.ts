@@ -1,7 +1,7 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
 import PlannerDate from '../utils/planner-date';
-import Task from '../utils/task';
+import Task from '../models/task';
 import EndTaskPrompt from './components/end-task-prompt';
 import NewTaskPrompt from './components/new-task-prompt';
 import UpdateTaskPrompt from './components/update-task-prompt';
