@@ -40,6 +40,20 @@ export default class EndTaskPrompt {
     open(task: Task) {
         this.task = task;
         this.taskEndDate.value = toRFC3339String(new Date());
+
+        this.taskEndDate.oninput = () => {
+            const start = task.getStart();
+            const end = new Date(this.taskEndDate.value);
+
+            if (start.getTime() > end.getTime()) {
+                this.taskEndDate.setCustomValidity("Task can't end before it has started!");
+                return;
+            }
+
+            this.taskEndDate.setCustomValidity("");
+        }
+
+
         this.section.hidden = false;
         this.section.classList.add("popup");
     }

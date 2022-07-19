@@ -68,6 +68,19 @@ export default class UpdateTaskPrompt {
         if (end) {
             this.taskEndDate.value = toRFC3339String(end);
             this.taskEndDateFieldset.classList.remove("hidden");
+
+            this.taskStartDate.oninput = this.taskEndDate.oninput = () => {
+                const start = new Date(this.taskStartDate.value);
+                const end = new Date(this.taskEndDate.value);
+
+                let message = "";
+                if (start.getTime() > end.getTime()) {
+                    message = "Task can't end before it has started!";
+                }
+
+                this.taskStartDate.setCustomValidity(message);
+                this.taskEndDate.setCustomValidity(message);
+            }
         }
 
         this.section.hidden = false;
