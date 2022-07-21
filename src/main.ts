@@ -8,15 +8,23 @@ import WeekPlanner from "./views/week-planner";
 const start = async () => {
     const navBar = new NavBar(document);
     const planner = new WeekPlanner(document.body);
-    const days = PlannerDate.ThisWeek();
+    let days = PlannerDate.ThisWeek();
 
     const tasks = await Tasks.create(window.indexedDB);
     const render = async () => {
         planner.render(days, await tasks.getTasks(days));
     }
 
-    navBar.onNewActivity(() => {
-        planner.newTaskPrompt.open();
+    navBar.onNewActivity(() => planner.newTaskPrompt.open());
+
+    navBar.onNext(async () => {
+        days = PlannerDate.NextWeek(days[0]);
+        await render();
+    });
+
+    navBar.onPrevious(async () => {
+        days = PlannerDate.PreviousWeek(days[0]);
+        await render();
     });
 
     planner.newTaskPrompt.onNew(async (t: Task) => {
@@ -34,14 +42,12 @@ const start = async () => {
         await render();
     });
 
-    planner.endTaskPrompt.onEnd(async (t: Task) => {
-        await tasks.updateTask(t);
+    planner.endTaskPrompt.onEnd(async (t: Task, end: Date) => {
+        await tasks.completeTask(t, end);
         await render();
     });
 
-    document.onclick = () => {
-        planner.unfocus();
-    }
+    document.onclick = () => planner.unfocus();
 
     await render();
 };

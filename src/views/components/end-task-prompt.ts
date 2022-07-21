@@ -7,7 +7,7 @@ export default class EndTaskPrompt {
     private section: HTMLElement;
     private form: HTMLFormElement;
     private taskEndDate: HTMLInputElement;
-    private callback: (t: Task) => void = () => {};
+    private callback: (t: Task, end: Date) => void = () => {};
 
     constructor(section: HTMLElement) {
         this.section = section;
@@ -22,9 +22,7 @@ export default class EndTaskPrompt {
                 return;
             }
 
-            this.task.setEnd(new Date(this.taskEndDate.value))
-
-            this.callback(this.task);
+            this.callback(this.task, new Date(this.taskEndDate.value));
             this.close();
         };
 
@@ -33,7 +31,7 @@ export default class EndTaskPrompt {
         };
     }
 
-    onEnd(callback: (task: Task) => void) {
+    onEnd(callback: (task: Task, end: Date) => void) {
         this.callback = callback;
     }
 

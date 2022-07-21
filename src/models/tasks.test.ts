@@ -1,16 +1,17 @@
-import "fake-indexeddb/auto";
-import { IDBFactory } from "fake-indexeddb";
+export {}
 
-import Tasks from "./tasks";
+// import "fake-indexeddb/auto";
 
-describe("tasks", () => {
-    let tasks: Tasks;
+// import Tasks from "./tasks";
 
-    beforeEach(async () => {
-        tasks = await Tasks.create(new IDBFactory());
-    });
+// describe("tasks", () => {
+//     let tasks: Tasks;
 
-    describe("addTask", () => {
+//     beforeEach(async () => {
+//         tasks = await Tasks.create(new IDBFactory());
+//     });
 
-    });
-});
+//     describe("addTask", () => {
+
+//     });
+// });
