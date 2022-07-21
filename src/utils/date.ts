@@ -43,6 +43,26 @@ export function toWeekString(d: Date): string {
     return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 }
 
+export function getWeekStrings(start: Date, end: Date | undefined): string[] {
+    let week = toWeekString(start);
+    if (!end) {
+        return [week];
+    }
+    const last = toWeekString(end);
+
+    const weeks = [ week ];
+    const date = new Date(start);
+
+    while (week !== last) {
+        date.setDate(date.getDate() + 7);
+        week = toWeekString(date);
+        weeks.push(week);
+    }
+
+    return weeks;
+}
+
+
 export function getDaySuffix(day: number): string {
     switch (day) {
         case 1:
