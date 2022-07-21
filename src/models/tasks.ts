@@ -202,14 +202,14 @@ export default class Tasks {
 
         const index = store.index("dates");
         const range = IDBKeyRange.bound([THE_PAST, start], [end, THE_FUTURE], true);
-        const query = index.openCursor(range);
+        const request = index.openCursor(range);
 
         return new Promise<Task[]>((resolve, reject) => {
             const tasks: Task[] = [];
 
-            query.onerror = () => reject(new Error(`Failed to fetch start tasks: ${query.error?.message}`));
-            query.onsuccess = () => {
-                const cursor = query.result;
+            request.onerror = () => reject(new Error(`Failed to fetch start tasks: ${request.error?.message}`));
+            request.onsuccess = () => {
+                const cursor = request.result;
                 if (cursor === null) {
                     resolve(tasks);
                     return;
@@ -218,6 +218,27 @@ export default class Tasks {
                 tasks.push(Task.deserialize(cursor.value));
                 cursor.continue();
             }
+        });
+    }
+
+    private async getOpenTasks(store: IDBObjectStore, end: Date): Promise<Task[]> {
+        const index = store.index("start");
+        const request = index.openCursor(IDBKeyRange.upperBound(end));
+
+        return new Promise((resolve, reject) => {
+            const tasks: Task[] = [];
+
+            request.onerror = () => reject(new Error(`failed to get open tasks: ${request.error?.message}`));
+            request.onsuccess = () => {
+                const cursor = request.result;
+                if (!cursor) {
+                    resolve(tasks);
+                    return
+                }
+
+                tasks.push(Task.deserialize(cursor.value));
+                cursor.continue();
+            };
         });
     }
 }
