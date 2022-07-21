@@ -193,31 +193,33 @@ export default class Tasks {
     }
 
     async getTasks(days: PlannerDate[]): Promise<Task[]> {
-        const transaction = this.database.transaction(["tasks"], "readonly");
-        const store = transaction.objectStore("tasks");
-
-        const start = days[0].getDate();
+        const stores = this.getStores();
         const end = new Date(days[days.length - 1].getDate());
         end.setDate(end.getDate() + 1);
 
-        const index = store.index("dates");
-        const range = IDBKeyRange.bound([THE_PAST, start], [end, THE_FUTURE], true);
-        const request = index.openCursor(range);
+        const openTasks = await this.getOpenTasks(stores.openTasks, end);
+    }
 
-        return new Promise<Task[]>((resolve, reject) => {
+    private async getFinishedTask(store: IDBObjectStore, ids: number[]): Promise<Task[]> {
+        const request = store.openCursor(ids[0]);
+
+        return new Promise((resolve, reject) => {
+            let index = 0;
             const tasks: Task[] = [];
 
-            request.onerror = () => reject(new Error(`Failed to fetch start tasks: ${request.error?.message}`));
+            request.onerror = () => reject(new Error(`failed to get finished tasks: ${request.error?.message}`));
             request.onsuccess = () => {
                 const cursor = request.result;
-                if (cursor === null) {
+                if (!cursor) {
                     resolve(tasks);
-                    return;
+                    return
                 }
 
                 tasks.push(Task.deserialize(cursor.value));
-                cursor.continue();
-            }
+
+                index++;
+                cursor.continue(ids[index]);
+            };
         });
     }
 
