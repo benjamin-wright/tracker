@@ -1,9 +1,7 @@
-import { getWeekStrings } from "../utils/date";
-import PlannerDate from "../utils/planner-date";
 import Task from "./task";
 
-export default class Tasks {
-    static create(indexedDB: IDBFactory): Promise<Tasks> {
+export default class TaskDB {
+    static create(indexedDB: IDBFactory): Promise<TaskDB> {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("tracker-tasks", 1);
 
@@ -27,7 +25,7 @@ export default class Tasks {
             };
 
             request.onsuccess = () => {
-                resolve(new Tasks(request.result));
+                resolve(new TaskDB(request.result));
             };
         });
     }
@@ -38,35 +36,23 @@ export default class Tasks {
         this.database = database;
     }
 
-    private getStores(): ObjectStores {
-        const transaction = this.database.transaction(["open-tasks", "finished-tasks", "finished-task-lookup"], "readwrite");
-
-        return {
-            openTasks: transaction.objectStore("open-tasks"),
-            finishedTasks: transaction.objectStore("finished-tasks"),
-            finishedTaskLookup: transaction.objectStore("finished-task-lookup")
-        }
+    private store(store: string): IDBObjectStore {
+        const transaction = this.database.transaction(store, "readwrite");
+        return transaction.objectStore(store);
     }
 
-    async addTask(task: Task): Promise<void> {
-        const stores = this.getStores();
-
-        if (task.isEnded()) {
-            const id = await this.addTaskToStore(stores.finishedTasks, task);
-            await this.addLookup(
-                stores.finishedTaskLookup,
-                id,
-                getWeekStrings(task.getStart(), task.getEnd())
-            );
-        } else {
-            await this.addTaskToStore(stores.openTasks, task);
-        }
+    async addOpenTask(task: Task): Promise<number> {
+        console.debug(`adding open task: ${task.getContent()}`);
+        return this.addTask("open-tasks", task);
     }
 
-    private async addTaskToStore(store: IDBObjectStore, task: Task): Promise<number> {
-        console.debug(`adding task to ${store.name}: ${task.getContent()}`);
+    async addFinishedTask(task: Task): Promise<number> {
+        console.debug(`adding finished task: ${task.getContent()}`);
+        return this.addTask("finished-tasks", task);
+    }
 
-        const request = store.add(task.serialize());
+    private async addTask(store: string, task: Task): Promise<number> {
+        const request = this.store(store).add(task.serialize());
 
         return new Promise((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to insert task: ${request.error?.message}`));
@@ -74,19 +60,19 @@ export default class Tasks {
         });
     }
 
-    private async addLookup(store: IDBObjectStore, id: number, weeks: string[]): Promise<void[]> {
+    async addLookup(id: number, weeks: string[]): Promise<void[]> {
         console.debug(`adding lookup for weeks ${weeks.join(', ')}`);
 
         return Promise.all<void>(
             weeks.map(async week => {
-                const current = await this.getLookup(store, week);
+                const current = await this.getLookup(week);
 
                 if (current.includes(id)) {
                     return Promise.resolve();
                 }
 
                 current.push(id);
-                const request = store.put(current, week);
+                const request = this.store("finished-task-lookup").put(current, week);
 
                 return new Promise<void>((resolve, reject) => {
                     request.onerror = () => reject(new Error(`Failed to insert task: ${request.error?.message}`));
@@ -96,8 +82,8 @@ export default class Tasks {
         );
     }
 
-    private async getLookup(store: IDBObjectStore, week: string): Promise<number[]> {
-        const request = store.get(week);
+    async getLookup(week: string): Promise<number[]> {
+        const request = this.store("finished-task-lookup").get(week);
 
         return new Promise<number[]>((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to get lookup: ${request.error?.message}`));
@@ -105,24 +91,43 @@ export default class Tasks {
         });
     }
 
-    async updateTask(task: Task): Promise<void> {
-        const stores = this.getStores();
-        if (task.getEnd()) {
-            await this.updateFinishedTask(stores.finishedTasks, stores.finishedTaskLookup, task);
-        } else {
-            await this.updateTaskInStore(stores.openTasks, task);
-        }
+    async removeLookup(id: number, weeks: string[]): Promise<void[]> {
+        console.debug(`adding lookup for weeks ${weeks.join(', ')}`);
+
+        return Promise.all<void>(
+            weeks.map(async week => {
+                const current = await this.getLookup(week);
+                if (!current.includes(id)) {
+                    return Promise.resolve();
+                }
+
+                current.splice(current.indexOf(id), 1);
+
+                let request: IDBRequest;
+
+                if (current.length === 0) {
+                    request = this.store("finished-task-lookup").delete(week);
+                } else {
+                    request = this.store("finished-task-lookup").put(current, week);
+                }
+
+                return new Promise<void>((resolve, reject) => {
+                    request.onerror = () => reject(new Error(`Failed to update lookup: ${request.error?.message}`));
+                    request.onsuccess = () => resolve();
+                });
+            })
+        );
     }
 
-    private async updateFinishedTask(store: IDBObjectStore, lookups: IDBObjectStore, task: Task): Promise<void> {
-        const [ original ] = await this.getFinishedTasks(store, [task.getId()]);
-        await this.removeLookup(lookups, task.getId(), getWeekStrings(original.getStart(), original.getEnd()));
-
-        await this.updateTaskInStore(store, task);
-        this.addLookup(lookups, task.getId(), getWeekStrings(task.getStart(), task.getEnd()))
+    async updateOpenTask(task: Task): Promise<void> {
+        return this.updateTask(this.store("open-tasks"), task);
     }
 
-    private async updateTaskInStore(store: IDBObjectStore, task: Task): Promise<void> {
+    async updateFinishedTask(task: Task): Promise<void> {
+        return this.updateTask(this.store("finished-tasks"), task);
+    }
+
+    private async updateTask(store: IDBObjectStore, task: Task): Promise<void> {
         const request = store.put(task.serialize());
 
         return new Promise((resolve, reject) => {
@@ -131,30 +136,15 @@ export default class Tasks {
         });
     }
 
-    async completeTask(task: Task, end: Date): Promise<void> {
-        await this.removeTask(task);
-        task.clearId();
-        task.setEnd(end);
-
-        await this.addTask(task)
+    async removeOpenTask(task: Task): Promise<void> {
+        return this.removeTask(this.store("open-tasks"), task);
     }
 
-    async removeTask(task: Task): Promise<void> {
-        const stores = this.getStores();
-
-        if (task.isEnded()) {
-            await this.removeTaskFromStore(stores.finishedTasks, task);
-            await this.removeLookup(
-                stores.finishedTaskLookup,
-                task.getId(),
-                getWeekStrings(task.getStart(), task.getEnd())
-            )
-        } else {
-            await this.removeTaskFromStore(stores.openTasks, task);
-        }
+    async removeFinishedTask(task: Task): Promise<void> {
+        return this.removeTask(this.store("finished-tasks"), task);
     }
 
-    private async removeTaskFromStore(store: IDBObjectStore, task: Task): Promise<void> {
+    private async removeTask(store: IDBObjectStore, task: Task): Promise<void> {
         console.debug(`removing task ${task.getId()} from store ${store.name}`);
 
         const id = task.getId();
@@ -167,67 +157,10 @@ export default class Tasks {
         });
     }
 
-    private async removeLookup(store: IDBObjectStore, id: number, weeks: string[]): Promise<void[]> {
-        console.debug(`adding lookup for weeks ${weeks.join(', ')}`);
-
-        return Promise.all<void>(
-            weeks.map(async week => {
-                const current = await this.getLookup(store, week);
-                if (!current.includes(id)) {
-                    return Promise.resolve();
-                }
-
-                current.splice(current.indexOf(id), 1);
-
-                let request: IDBRequest;
-
-                if (current.length === 0) {
-                    request = store.delete(week);
-                } else {
-                    request = store.put(current, week);
-                }
-
-                return new Promise<void>((resolve, reject) => {
-                    request.onerror = () => reject(new Error(`Failed to update lookup: ${request.error?.message}`));
-                    request.onsuccess = () => resolve();
-                });
-            })
-        );
-    }
-
-    async getTasks(days: PlannerDate[]): Promise<Task[]> {
-        const tasks: Task[] = [];
-
-        const stores = this.getStores();
-        const today = new Date();
-        const end = new Date(days[days.length - 1].getDate());
-        end.setDate(end.getDate() + 1);
-
-        const weeks = getWeekStrings(days[0].getDate(), end);
-        const ids: number[] = [];
-        for (let i = 0; i < weeks.length; i++) {
-            const weekTaskIds = await this.getLookup(stores.finishedTaskLookup, weeks[i]);
-
-            weekTaskIds.forEach(id => {
-                if (!ids.includes(id)) {
-                    ids.push(id);
-                }
-            });
-        }
-
-        tasks.push(...await this.getFinishedTasks(stores.finishedTasks, ids));
-
-        if (days[0].getDate() < today) {
-            tasks.push(...await this.getOpenTasks(stores.openTasks, end));
-        }
-
-        return tasks;
-    }
-
-    private async getFinishedTasks(store: IDBObjectStore, ids: number[]): Promise<Task[]> {
+    async getFinishedTasks(ids: number[]): Promise<Task[]> {
         return Promise.all<Task>(
             ids.map(id => {
-                const request = store.get(id);
+                const request = this.store("finished-tasks").get(id);
 
                 return new Promise((resolve, reject) => {
                     request.onerror = () => reject(new Error(`failed to get finished tasks: ${request.error?.message}`));
@@ -237,8 +170,8 @@ export default class Tasks {
         );
     }
 
-    private async getOpenTasks(store: IDBObjectStore, end: Date): Promise<Task[]> {
-        const index = store.index("start");
+    async getOpenTasks(end: Date): Promise<Task[]> {
+        const index = this.store("open-tasks").index("start");
         const request = index.openCursor(IDBKeyRange.upperBound(end));
 
         return new Promise((resolve, reject) => {
@@ -259,8 +192,7 @@ export default class Tasks {
     }
 
     async getAllOpenTasks(): Promise<Task[]> {
-        const stores = this.getStores();
-        const request = stores.openTasks.getAll();
+        const request = this.store("open-tasks").getAll();
 
         return new Promise((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to get all open tasks: ${request.error?.message}`));
@@ -269,8 +201,7 @@ export default class Tasks {
     }
 
     async getAllFinishedTasks(): Promise<Task[]> {
-        const stores = this.getStores();
-        const request = stores.finishedTasks.getAll();
+        const request = this.store("finished-tasks").getAll();
 
         return new Promise((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to get all finished tasks: ${request.error?.message}`));
@@ -279,8 +210,8 @@ export default class Tasks {
     }
 
     async getAllLookups(): Promise<{[key: string]: number[]}> {
-        const stores = this.getStores();
-        const request = stores.finishedTaskLookup.getAllKeys();
+        const store = this.store("finished-task-lookup");
+        const request = store.getAllKeys();
 
         return new Promise((resolve, reject) => {
             request.onerror = () => reject(new Error(`Failed to get lookup keys: ${request.error?.message}`));
@@ -289,7 +220,7 @@ export default class Tasks {
 
                 for (let i = 0; i < request.result.length; i++) {
                     const key = request.result[i] as string;
-                    result[key] = await this.getLookup(stores.finishedTaskLookup, key);
+                    result[key] = await this.getLookup(key);
                 }
 
                 resolve(result);
