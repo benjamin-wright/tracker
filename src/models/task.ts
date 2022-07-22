@@ -4,10 +4,10 @@ export default class Task {
     private start: Date;
     private end: Date | undefined;
 
-    constructor(content: string, start: Date | null, end: Date | undefined, id: number | undefined) {
-        this.id = id || 0;
+    constructor(content: string, start = new Date(), end?: Date, id = 0) {
+        this.id = id;
         this.content = content;
-        this.start = start ? start : new Date();
+        this.start = start;
         this.end = end;
     }
 

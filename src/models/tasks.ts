@@ -213,7 +213,7 @@ export default class Tasks {
         const ids: number[] = [];
         for (let i = 0; i < weeks.length; i++) {
             const weekTaskIds = await this.getLookup(stores.finishedTaskLookup, weeks[i]);
-            
+
             weekTaskIds.forEach(id => {
                 if (!ids.includes(id)) {
                     ids.push(id);
@@ -260,6 +260,45 @@ export default class Tasks {
 
                 tasks.push(Task.deserialize(cursor.value));
                 cursor.continue();
+            };
+        });
+    }
+
+    async getAllOpenTasks(): Promise<Task[]> {
+        const stores = this.getStores();
+        const request = stores.openTasks.getAll();
+
+        return new Promise((resolve, reject) => {
+            request.onerror = () => reject(new Error(`Failed to get all open tasks: ${request.error?.message}`));
+            request.onsuccess = () => resolve(request.result.map(d => Task.deserialize(d)));
+        });
+    }
+
+    async getAllFinishedTasks(): Promise<Task[]> {
+        const stores = this.getStores();
+        const request = stores.finishedTasks.getAll();
+
+        return new Promise((resolve, reject) => {
+            request.onerror = () => reject(new Error(`Failed to get all finished tasks: ${request.error?.message}`));
+            request.onsuccess = () => resolve(request.result.map(d => Task.deserialize(d)));
+        });
+    }
+
+    async getAllLookups(): Promise<{[key: string]: number[]}> {
+        const stores = this.getStores();
+        const request = stores.finishedTaskLookup.getAllKeys();
+
+        return new Promise((resolve, reject) => {
+            request.onerror = () => reject(new Error(`Failed to get lookup keys: ${request.error?.message}`));
+            request.onsuccess = async () => {
+                const result: {[key: string]: number[]} = {};
+
+                for (let i = 0; i < request.result.length; i++) {
+                    const key = request.result[i] as string;
+                    result[key] = await this.getLookup(stores.finishedTaskLookup, key);
+                }
+
+                resolve(result);
             };
         });
     }
