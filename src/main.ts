@@ -1,29 +1,29 @@
 import Tasks from "./models/tasks";
 import "./styles.css"
-import PlannerDate from "./utils/planner-date";
 import Task from "./models/task";
 import NavBar from "./views/nav-bar";
 import WeekPlanner from "./views/week-planner";
+import Week from "./models/week";
 
 const start = async () => {
     const navBar = new NavBar(document);
     const planner = new WeekPlanner(document.body);
-    let days = PlannerDate.ThisWeek();
+    let week = Week.ThisWeek();
 
     const tasks = await Tasks.create(window.indexedDB);
     const render = async () => {
-        planner.render(days, await tasks.getTasks(days));
+        planner.render(week, await tasks.getTasks(week));
     }
 
     navBar.onNewActivity(() => planner.newTaskPrompt.open());
 
     navBar.onNext(async () => {
-        days = PlannerDate.NextWeek(days[0]);
+        week = week.nextWeek();
         await render();
     });
 
     navBar.onPrevious(async () => {
-        days = PlannerDate.PreviousWeek(days[0]);
+        week = week.previousWeek();
         await render();
     });
 

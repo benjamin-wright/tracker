@@ -1,11 +1,12 @@
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
-import PlannerDate from '../utils/planner-date';
 import Task from '../models/task';
 import EndTaskPrompt from './components/end-task-prompt';
 import NewTaskPrompt from './components/new-task-prompt';
 import UpdateTaskPrompt from './components/update-task-prompt';
 import './planner.css';
+import Week from '../models/week';
+import Day from '../models/day';
 
 export default class WeekPlanner {
     private headers: HTMLElement;
@@ -29,13 +30,13 @@ export default class WeekPlanner {
         this.taskList = [];
     }
 
-    async render(days: PlannerDate[], tasks: Task[]) {
+    async render(week: Week, tasks: Task[]) {
         await graphics.nextFrame();
 
         this.clear();
-        this.headers.append(...this.makeHeaders(days));
+        this.headers.append(...this.makeHeaders(week));
 
-        this.taskList = this.makeTasks(days, tasks);
+        this.taskList = this.makeTasks(week, tasks);
         this.tasks.append(...this.taskList);
     }
 
@@ -53,8 +54,8 @@ export default class WeekPlanner {
         this.taskList.forEach(t => t.classList.remove("focus"));
     }
 
-    private makeHeaders(days: PlannerDate[]): Node[] {
-        return days.map((day: PlannerDate, _index: number) => {
+    private makeHeaders(week: Week): Node[] {
+        return week.days().map((day: Day, _index: number) => {
             if (!this.headerTemplate.content.firstElementChild) {
                 throw new Error("header template did not contain a valid HTML element");
             }
@@ -66,16 +67,15 @@ export default class WeekPlanner {
                 throw new Error("expected header template to contain a paragraph!");
             }
 
-            para.innerHTML = `${day.toShortDay()} ${day.toNumber()}`;
-            para.title = day.toString();
-
-            header.title = day.toString();
+            para.innerHTML = `${day.toShortString()} ${day.toDayOfMonth()}`;
+            para.title = day.toDateString();
+            header.title = day.toDateString();
 
             return header;
         });
     }
 
-    private makeTasks(days: PlannerDate[], tasks: Task[]): HTMLElement[] {
+    private makeTasks(week: Week, tasks: Task[]): HTMLElement[] {
         return tasks.reduce<HTMLElement[]>((accumulator: HTMLElement[], t: Task) => {
             if (!this.taskTemplate.content.firstElementChild) {
                 console.error("header template did not contain a valid HTML element");
@@ -100,18 +100,18 @@ export default class WeekPlanner {
 
             const taskStart = t.getStart();
             const taskEnd = t.getEnd();
-            const startMargin = this.getWeekProgress(days, taskStart);
-            const endMargin = taskEnd ? 1 - this.getWeekProgress(days, taskEnd) : 1 - this.getWeekProgress(days, new Date());
+            const startMargin = week.getProgress(taskStart);
+            const endMargin = taskEnd ? 1 - week.getProgress(taskEnd) : 1 - week.getProgress(new Date());
             const taskLength = (1 - endMargin - startMargin);
 
             task.setAttribute("style", `margin-left:${startMargin * 100}%;margin-right:${endMargin * 100}%; min-width:${taskLength * 100}%`);
             task.title = `Task: ${t.getContent()}\nStart: ${taskStart.toLocaleTimeString()}`;
             
-            if (this.isInRange(days, taskStart)) {
+            if (week.includes(taskStart)) {
                 task.classList.add("started");
             }
             
-            if (taskEnd && this.isInRange(days, taskEnd)) {
+            if (taskEnd && week.includes(taskEnd)) {
                 task.classList.add("complete");
             }
 
@@ -134,36 +134,5 @@ export default class WeekPlanner {
             accumulator.push(task);
             return accumulator;
         }, []);
-    }
-
-    private isInRange(days: PlannerDate[], date: Date): boolean {
-        const start = days[0].getDate();
-        if (date < start) {
-            return false;
-        }
-
-        const end = new Date(days[days.length - 1].getDate());
-        end.setDate(end.getDate() + 1);
-        if (date > end) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private getWeekProgress(days: PlannerDate[], date: Date) {
-        const start = days[0].getDate();
-        if (date < start) {
-            return 0;
-        }
-
-        const end = new Date(days[days.length - 1].getDate());
-        end.setDate(end.getDate() + 1);
-        if (date > end) {
-            return 1;
-        }
-
-        let dayIndex = days.findIndex(d => d.isToday(date));
-        return (dayIndex + days[dayIndex].getDayFraction(date)) / days.length
     }
 }

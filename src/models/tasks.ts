@@ -1,7 +1,7 @@
 import { getWeekStrings } from "../utils/date";
-import PlannerDate from "../utils/planner-date";
 import Task from "./task";
 import TaskDB from "./taskDB";
+import Week from "./week";
 
 export default class Tasks {
     static async create(indexedDB: IDBFactory): Promise<Tasks> {
@@ -58,14 +58,15 @@ export default class Tasks {
         }
     }
 
-    async getTasks(days: PlannerDate[]): Promise<Task[]> {
+    async getTasks(week: Week): Promise<Task[]> {
         const tasks: Task[] = [];
 
         const today = new Date();
-        const end = new Date(days[days.length - 1].getDate());
-        end.setDate(end.getDate() + 1);
+        const start = week.getStart();
+        const end = new Date(week.getEnd());
+        end.setSeconds(-1);
 
-        const weeks = getWeekStrings(days[0].getDate(), end);
+        const weeks = getWeekStrings(start, end);
         const ids: number[] = [];
         for (let i = 0; i < weeks.length; i++) {
             const weekTaskIds = await this.db.getLookup(weeks[i]);
@@ -79,7 +80,7 @@ export default class Tasks {
 
         tasks.push(...await this.db.getFinishedTasks(ids));
 
-        if (days[0].getDate() < today) {
+        if (start < today) {
             tasks.push(...await this.db.getOpenTasks(end));
         }
 

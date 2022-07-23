@@ -1,4 +1,4 @@
-function paddedString(n: number, length: number): string {
+export function paddedString(n: number, length: number): string {
     let str = n.toFixed(0);
 
     while (str.length < length) {
@@ -32,13 +32,15 @@ export function toRFC3339String(d: Date): string {
 export function toWeekString(d: Date): string {
     let day = new Date(d);
 
-    // wind back to the 0th day (sunday)
-    while (day.getDay() > 0) {
+    // day 0 is sunday which we want to be in the previous week, so step back to saturday
+    if (day.getDay() == 0) {
         day.setDate(day.getDate() - 1);
     }
 
-    // go forward one
-    day.setDate(day.getDate() + 1);
+    // wind back to the 1st day (monday)
+    while (day.getDay() > 1) {
+        day.setDate(day.getDate() - 1);
+    }
 
     return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 }

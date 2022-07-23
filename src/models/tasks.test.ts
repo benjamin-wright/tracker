@@ -1,7 +1,7 @@
 import "fake-indexeddb/auto";
-import PlannerDate from "../utils/planner-date";
 import Task from "./task";
 import Tasks from "./tasks";
+import Week from "./week";
 
 describe("tasks", () => {
     let tasks: Tasks;
@@ -275,9 +275,7 @@ describe("tasks", () => {
         });
 
         it("should bring back the right tasks for the current week", async () => {
-            const days = PlannerDate.ThisWeek();
-            
-            expect(await tasks.getTasks(days)).toEqual([
+            expect(await tasks.getTasks(Week.ThisWeek())).toEqual([
                 { "id": 1, "content": "finished", "start": new Date("2021-05-25T11:00:00.000Z"), "end": new Date("2021-05-26T09:30:00.000Z") },
                 { "id": 2, "content": "multi-week", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-24T12:30:00.000Z") },
                 { "id": 1, "content": "spanning", "start": new Date("2021-05-17T10:00:00.000Z") },
@@ -286,17 +284,13 @@ describe("tasks", () => {
         });
 
         it("should bring back the right tasks for a future week", async () => {
-            const days = PlannerDate.NextWeek(PlannerDate.Today());
-            
-            expect(await tasks.getTasks(days)).toEqual([
+            expect(await tasks.getTasks(Week.ThisWeek().nextWeek())).toEqual([
                 { "id": 4, "content": "future", "start": new Date("2021-06-03T11:00:00.000Z"), "end": new Date("2021-06-04T12:30:00.000Z") },      
             ]);
         });
 
         it("should bring back the right tasks for a past week", async () => {
-            const days = PlannerDate.PreviousWeek(PlannerDate.Today());
-            
-            expect(await tasks.getTasks(days)).toEqual([
+            expect(await tasks.getTasks(Week.ThisWeek().previousWeek())).toEqual([
                 { "id": 2, "content": "multi-week", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-24T12:30:00.000Z") },
                 { "id": 3, "content": "past", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-19T12:30:00.000Z") },      
                 { "id": 1, "content": "spanning", "start": new Date("2021-05-17T10:00:00.000Z") },
