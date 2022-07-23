@@ -1,4 +1,5 @@
 import "fake-indexeddb/auto";
+import PlannerDate from "../utils/planner-date";
 import Task from "./task";
 import Tasks from "./tasks";
 
@@ -253,6 +254,53 @@ describe("tasks", () => {
                 expect(await tasks.getAllFinishedTasks()).toEqual(test.expected.finishedTasks || []);
                 expect(await tasks.getAllLookups()).toEqual(test.expected.lookup || {});
             });
+        });
+    });
+
+    describe("getTasks", () => {
+        beforeEach(async () => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date("2021-05-27T12:00:00.000Z"));
+
+            await tasks.addTask(new Task("spanning", new Date("2021-05-17T10:00:00.000Z")));
+            await tasks.addTask(new Task("during", new Date("2021-05-25T10:00:00.000Z")));
+            await tasks.addTask(new Task("finished", new Date("2021-05-25T11:00:00.000Z"), new Date("2021-05-26T09:30:00.000Z")));
+            await tasks.addTask(new Task("multi-week", new Date("2021-05-18T11:00:00.000Z"), new Date("2021-05-24T12:30:00.000Z")));
+            await tasks.addTask(new Task("past", new Date("2021-05-18T11:00:00.000Z"), new Date("2021-05-19T12:30:00.000Z")));
+            await tasks.addTask(new Task("future", new Date("2021-06-03T11:00:00.000Z"), new Date("2021-06-04T12:30:00.000Z")));
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it("should bring back the right tasks for the current week", async () => {
+            const days = PlannerDate.ThisWeek();
+            
+            expect(await tasks.getTasks(days)).toEqual([
+                { "id": 1, "content": "finished", "start": new Date("2021-05-25T11:00:00.000Z"), "end": new Date("2021-05-26T09:30:00.000Z") },
+                { "id": 2, "content": "multi-week", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-24T12:30:00.000Z") },
+                { "id": 1, "content": "spanning", "start": new Date("2021-05-17T10:00:00.000Z") },
+                { "id": 2, "content": "during", "start": new Date("2021-05-25T10:00:00.000Z") },             
+            ]);
+        });
+
+        it("should bring back the right tasks for a future week", async () => {
+            const days = PlannerDate.NextWeek(PlannerDate.Today());
+            
+            expect(await tasks.getTasks(days)).toEqual([
+                { "id": 4, "content": "future", "start": new Date("2021-06-03T11:00:00.000Z"), "end": new Date("2021-06-04T12:30:00.000Z") },      
+            ]);
+        });
+
+        it("should bring back the right tasks for a past week", async () => {
+            const days = PlannerDate.PreviousWeek(PlannerDate.Today());
+            
+            expect(await tasks.getTasks(days)).toEqual([
+                { "id": 2, "content": "multi-week", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-24T12:30:00.000Z") },
+                { "id": 3, "content": "past", "start": new Date("2021-05-18T11:00:00.000Z"), "end": new Date("2021-05-19T12:30:00.000Z") },      
+                { "id": 1, "content": "spanning", "start": new Date("2021-05-17T10:00:00.000Z") },
+            ]);
         });
     });
 });
