@@ -42,6 +42,8 @@ export default class NewTaskPrompt {
         this.taskStartDate.value = toRFC3339String(new Date());
         this.section.hidden = false;
         this.section.classList.add("popup");
+        this.section.classList.add("offscreen");
+        setTimeout(() => this.section.classList.remove("offscreen"));
     }
 
     close() {

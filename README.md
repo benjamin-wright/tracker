@@ -9,3 +9,4 @@ Track work tasks throughout the week
 - Show completed tasks for a given week
 - Add swim lanes for related tasks
 - Better expansion for tasks near the edge of the planner
+- Stable sort for tasks

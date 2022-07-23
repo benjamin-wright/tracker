@@ -1,10 +1,14 @@
+import './planner.css';
+
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
-import Task from '../models/task';
+
 import EndTaskPrompt from './components/end-task-prompt';
 import NewTaskPrompt from './components/new-task-prompt';
 import UpdateTaskPrompt from './components/update-task-prompt';
-import './planner.css';
+import PlannerNav from './components/planner-nav';
+
+import Task from '../models/task';
 import Week from '../models/week';
 import Day from '../models/day';
 
@@ -14,21 +18,21 @@ export default class WeekPlanner {
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
     private taskList: HTMLElement[];
-    private plannerHeading: HTMLElement;
 
     newTaskPrompt: NewTaskPrompt;
     updateTaskPrompt: UpdateTaskPrompt;
     endTaskPrompt: EndTaskPrompt;
+    nav: PlannerNav;
 
     constructor(body: HTMLElement) {
         this.headers = find.byId(body, "planner-background");
         this.tasks = find.byId(body, "planner-tasks");
         this.headerTemplate = find.templateById(body, "header-tpl");
         this.taskTemplate = find.templateById(body, "task-tpl");
+        this.nav = new PlannerNav(find.byId(body, "planner-nav"));
         this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"));
         this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"));
         this.endTaskPrompt = new EndTaskPrompt(find.byId(body, "end-task-prompt"));
-        this.plannerHeading = find.byId(body, "planner-heading");
         this.taskList = [];
     }
 
@@ -37,7 +41,7 @@ export default class WeekPlanner {
 
         this.clear();
 
-        this.plannerHeading.innerText = `Week: ${week.toDateString()}`;
+        this.nav.update(`Week: ${week.toDateString()}`);
 
         this.headers.append(...this.makeHeaders(week));
 
@@ -46,7 +50,7 @@ export default class WeekPlanner {
     }
 
     clear() {
-        this.plannerHeading.innerText = "";
+        this.nav.clear();
 
         while (this.headers.firstChild) {
             this.headers.removeChild(this.headers.firstChild);

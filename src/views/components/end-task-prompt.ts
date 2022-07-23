@@ -54,6 +54,8 @@ export default class EndTaskPrompt {
 
         this.section.hidden = false;
         this.section.classList.add("popup");
+        this.section.classList.add("offscreen");
+        setTimeout(() => this.section.classList.remove("offscreen"));
     }
 
     close() {
