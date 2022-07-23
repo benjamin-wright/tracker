@@ -23,7 +23,18 @@ export default class PlannerDate {
 
     static ThisWeek(): PlannerDate[] {
         let day = new Date();
+        return this.getWeek(day);
+    }
 
+    static PreviousWeek(date: PlannerDate): PlannerDate[] {
+        return this.getWeek(date.daysAgo(7).date);
+    }
+
+    static NextWeek(date: PlannerDate): PlannerDate[] {
+        return this.getWeek(date.daysAgo(-7).date);
+    }
+
+    private static getWeek(day: Date): PlannerDate[] {
         // if it's sunday then jump back a day, so that weeks run from mon -> sun instead of sun -> sat
         if (day.getDay() === 0) {
             day.setDate(day.getDate() - 1);

@@ -1,25 +1,26 @@
-export const THE_PAST = new Date("0000-01-01");
-export const THE_FUTURE = new Date("9999-01-02");
-
 export default class Task {
-    private id: number | undefined;
+    private id: number;
     private content: string;
     private start: Date;
     private end: Date | undefined;
 
-    constructor(content: string, start: Date | null, end: Date | undefined, id: number | undefined) {
+    constructor(content: string, start = new Date(), end?: Date, id = 0) {
         this.id = id;
         this.content = content;
-        this.start = start ? start : new Date();
+        this.start = start;
         this.end = end;
     }
 
-    getId(): number | undefined {
+    getId(): number {
         return this.id;
     }
 
     setId(id: number) {
         this.id = id;
+    }
+
+    clearId() {
+        this.id = 0;
     }
 
     getContent(): string {
@@ -54,8 +55,8 @@ export default class Task {
         return {
             content: this.content,
             start: this.start,
-            end: this.end || THE_FUTURE,
-            ... this.id ? { id: this.id } : {}
+            ... this.end ? { end: this.end } : {},
+            ... this.id > 0 ? { id: this.id } : {}
         }
     }
 
@@ -63,7 +64,7 @@ export default class Task {
         return new Task(
             data.content,
             data.start,
-            (data.end as Date).getTime() == THE_FUTURE.getTime() ? undefined : data.end,
+            data.end,
             data.id
         )
     }

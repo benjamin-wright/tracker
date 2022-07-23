@@ -1,114 +1,100 @@
+import { getWeekStrings } from "../utils/date";
 import PlannerDate from "../utils/planner-date";
 import Task from "./task";
-import { THE_PAST, THE_FUTURE } from "./task";
+import TaskDB from "./taskDB";
 
 export default class Tasks {
-    static create(indexedDB: IDBFactory): Promise<Tasks> {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open("tracker-tasks", 1);
-
-            request.onerror = event => {
-                reject(`Failed to open database with error: ${JSON.stringify(event.target)}`);
-            };
-
-            request.onblocked = event => {
-                reject(`Failed to open database with blocked: ${JSON.stringify(event.target)}`);
-            };
-
-            request.onupgradeneeded = () => {
-                console.debug('initialising database...');
-                const db = request.result;
-
-                const os = db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
-                os.createIndex("dates", ["start", "end"], {unique: false});
-            };
-
-            request.onsuccess = () => {
-                resolve(new Tasks(request.result));
-            };
-        });
+    static async create(indexedDB: IDBFactory): Promise<Tasks> {
+        const db = await TaskDB.create(indexedDB);
+        return new Tasks(db);
     }
 
-    private database: IDBDatabase;
+    private db: TaskDB;
 
-    private constructor(database: IDBDatabase) {
-        this.database = database;
+    private constructor(db: TaskDB) {
+        this.db = db;
     }
 
-    async addTask(task: Task): Promise<Task> {
-        console.debug(`adding task: ${task.getContent()}`);
-        const transaction = this.database.transaction(["tasks"], "readwrite");
-        const store = transaction.objectStore("tasks");
-
-        const request = store.add(task.serialize());
-
-        return new Promise((resolve, reject) => {
-            request.onerror = () => reject(new Error(`Failed to insert task: ${request.error?.message}`));
-
-            request.onsuccess = () => {
-                task.setId(request.result as number);
-                resolve(task);
-            };
-        });
+    async addTask(task: Task): Promise<void> {
+        if (task.isEnded()) {
+            const id = await this.db.addFinishedTask(task);
+            await this.db.addLookup(
+                id,
+                getWeekStrings(task.getStart(), task.getEnd())
+            );
+        } else {
+            await this.db.addOpenTask(task);
+        }
     }
 
     async updateTask(task: Task): Promise<void> {
-        console.debug(`updating task ${task.getId()}`);
-        const transaction = this.database.transaction(["tasks"], "readwrite");
-        const store = transaction.objectStore("tasks");
+        if (task.getEnd()) {
+            const [ original ] = await this.db.getFinishedTasks([task.getId()]);
+            await this.db.removeLookup(task.getId(), getWeekStrings(original.getStart(), original.getEnd()));
+    
+            await this.db.updateFinishedTask(task);
+            await this.db.addLookup(task.getId(), getWeekStrings(task.getStart(), task.getEnd()))
+        } else {
+            await this.db.updateOpenTask(task);
+        }
+    }
 
-        const request = store.put(task.serialize());
-
-        return new Promise((resolve, reject) => {
-            request.onerror = () => reject(new Error(`Failed to update task: ${request.error?.message}`));
-            request.onsuccess = () => resolve()
-        });
+    async completeTask(task: Task, end: Date): Promise<void> {
+        await this.db.removeOpenTask(task);
+        task.clearId();
+        task.setEnd(end);
+        await this.addTask(task);
     }
 
     async removeTask(task: Task): Promise<void> {
-        console.debug(`removing task ${task.getId()}`);
-        const transaction = this.database.transaction(["tasks"], "readwrite");
-        const store = transaction.objectStore("tasks");
-
-        const id = task.getId();
-        if (id === undefined) {
-            return Promise.reject(new Error(`Can't delete task with null id: ${task.getContent()}`));
+        if (task.isEnded()) {
+            await this.db.removeFinishedTask(task);
+            await this.db.removeLookup(
+                task.getId(),
+                getWeekStrings(task.getStart(), task.getEnd())
+            )
+        } else {
+            await this.db.removeOpenTask(task);
         }
-
-        const request = store.delete(id);
-
-        return new Promise((resolve, reject) => {
-            request.onerror = () => reject(new Error(`Failed to delete task: ${request.error?.message}`));
-            request.onsuccess = () => resolve();
-        });
     }
 
     async getTasks(days: PlannerDate[]): Promise<Task[]> {
-        const transaction = this.database.transaction(["tasks"], "readonly");
-        const store = transaction.objectStore("tasks");
+        const tasks: Task[] = [];
 
-        const start = days[0].getDate();
+        const today = new Date();
         const end = new Date(days[days.length - 1].getDate());
         end.setDate(end.getDate() + 1);
 
-        const index = store.index("dates");
-        const range = IDBKeyRange.bound([THE_PAST, start], [end, THE_FUTURE], true);
-        const query = index.openCursor(range);
+        const weeks = getWeekStrings(days[0].getDate(), end);
+        const ids: number[] = [];
+        for (let i = 0; i < weeks.length; i++) {
+            const weekTaskIds = await this.db.getLookup(weeks[i]);
 
-        return new Promise<Task[]>((resolve, reject) => {
-            const tasks: Task[] = [];
-
-            query.onerror = () => reject(new Error(`Failed to fetch start tasks: ${query.error?.message}`));
-            query.onsuccess = () => {
-                const cursor = query.result;
-                if (cursor === null) {
-                    resolve(tasks);
-                    return;
+            weekTaskIds.forEach(id => {
+                if (!ids.includes(id)) {
+                    ids.push(id);
                 }
+            });
+        }
 
-                tasks.push(Task.deserialize(cursor.value));
-                cursor.continue();
-            }
-        });
+        tasks.push(...await this.db.getFinishedTasks(ids));
+
+        if (days[0].getDate() < today) {
+            tasks.push(...await this.db.getOpenTasks(end));
+        }
+
+        return tasks;
+    }
+
+    async getAllOpenTasks(): Promise<Task[]> {
+        return this.db.getAllOpenTasks();
+    }
+
+    async getAllFinishedTasks(): Promise<Task[]> {
+        return this.db.getAllFinishedTasks();
+    }
+
+    async getAllLookups(): Promise<{[key: string]: number[]}> {
+        return this.db.getAllLookups();
     }
 }
