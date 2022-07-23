@@ -14,6 +14,7 @@ export default class WeekPlanner {
     private headerTemplate: HTMLTemplateElement;
     private taskTemplate: HTMLTemplateElement;
     private taskList: HTMLElement[];
+    private plannerHeading: HTMLElement;
 
     newTaskPrompt: NewTaskPrompt;
     updateTaskPrompt: UpdateTaskPrompt;
@@ -27,6 +28,7 @@ export default class WeekPlanner {
         this.newTaskPrompt = new NewTaskPrompt(find.byId(body, "new-task-prompt"));
         this.updateTaskPrompt = new UpdateTaskPrompt(find.byId(body, "update-task-prompt"));
         this.endTaskPrompt = new EndTaskPrompt(find.byId(body, "end-task-prompt"));
+        this.plannerHeading = find.byId(body, "planner-heading");
         this.taskList = [];
     }
 
@@ -34,6 +36,9 @@ export default class WeekPlanner {
         await graphics.nextFrame();
 
         this.clear();
+
+        this.plannerHeading.innerText = `Week: ${week.toDateString()}`;
+
         this.headers.append(...this.makeHeaders(week));
 
         this.taskList = this.makeTasks(week, tasks);
@@ -41,6 +46,8 @@ export default class WeekPlanner {
     }
 
     clear() {
+        this.plannerHeading.innerText = "";
+
         while (this.headers.firstChild) {
             this.headers.removeChild(this.headers.firstChild);
         }

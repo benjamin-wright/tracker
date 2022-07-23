@@ -1,20 +1,23 @@
 <section id="planner">
-  <!-- Planner headers and columns -->
-  <template id="header-tpl">
-    <div class="header-col">
-      <p></p>
-    </div>
-  </template>
-  <div id="planner-background" class="week"></div>
+  <h2 id="planner-heading"></h2>
+  <div class="wrapper">
+    <!-- Planner headers and columns -->
+    <template id="header-tpl">
+      <div class="header-col">
+        <p></p>
+      </div>
+    </template>
+    <div id="planner-background" class="week"></div>
 
-  <!-- Task plotting overlay -->
-  <template id="task-tpl">
-    <div class="task">
-      <p></p>
-      <button>x</button>
-    </div>
-  </template>
-  <div id="planner-tasks" class="overlay"></div>
+    <!-- Task plotting overlay -->
+    <template id="task-tpl">
+      <div class="task">
+        <p></p>
+        <button>x</button>
+      </div>
+    </template>
+    <div id="planner-tasks" class="overlay"></div>
+  </div>
 </section>
 
 {{> new-task-prompt }}

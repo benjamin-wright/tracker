@@ -1,3 +1,4 @@
+import { paddedString } from "../utils/date";
 import Day from "./day";
 
 export default class Week {
@@ -91,5 +92,9 @@ export default class Week {
 
     getEnd(): Date {
         return this.end;
+    }
+
+    toDateString(): string {
+        return `${this.start.getFullYear()}-${paddedString(this.start.getMonth() + 1, 2)}-${paddedString(this.start.getDate(), 2)}`;
     }
 }

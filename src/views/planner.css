@@ -9,18 +9,27 @@
     position: absolute;
     z-index: 0;
     top: 0;
-    left: 1em;
+    left: 0;
     bottom: 0;
-    right: 1em;
+    right: 0;
 }
 
 #planner-tasks {
     display: flex;
     flex-direction: column;
-    padding: 0.5em 0.5em 0.5em 0.5em;
     pointer-events: none;
     position: relative;
+    padding-top: 1em;
     z-index: 1;
+}
+
+#planner h2 {
+    text-align: right;
+    margin-bottom: 1em;
+}
+
+.wrapper {
+    position: relative;
 }
 
 .week {
