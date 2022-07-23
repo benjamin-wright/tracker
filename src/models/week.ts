@@ -41,7 +41,7 @@ export default class Week {
         this.weekdays = [];
         const day = new Date(this.start);
         while (this.weekdays.length < 5) {
-            this.weekdays.push(new Day(day));
+            this.weekdays.push(new Day(new Date(day)));
             day.setDate(day.getDate() + 1);
         }
     }
