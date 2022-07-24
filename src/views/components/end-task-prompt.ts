@@ -59,9 +59,15 @@ export default class EndTaskPrompt {
     }
 
     close() {
-        this.task = undefined;
-        this.taskEndDate.value = "";
-        this.section.hidden = true;
-        this.section.classList.remove("popup");
+        this.section.classList.add("offscreen");
+
+        setTimeout(() => {
+            this.section.hidden = true;
+            this.section.classList.remove("popup");
+            this.section.classList.remove("offscreen");
+
+            this.task = undefined;
+            this.taskEndDate.value = "";
+        }, 250);
     }
 }

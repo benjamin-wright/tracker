@@ -93,12 +93,17 @@ export default class UpdateTaskPrompt {
     }
 
     close() {
-        this.task = undefined;
-        this.taskDescription.value = "";
-        this.taskStartDate.value = "";
-        this.taskEndDate.value = "";
+        this.section.classList.add("offscreen");
 
-        this.section.hidden = true;
-        this.section.classList.remove("popup");
+        setTimeout(() => {
+            this.task = undefined;
+            this.taskDescription.value = "";
+            this.taskStartDate.value = "";
+            this.taskEndDate.value = "";
+            
+            this.section.hidden = true;
+            this.section.classList.remove("popup");
+            this.section.classList.remove("offscreen");
+        }, 250);
     }
 }

@@ -47,9 +47,14 @@ export default class NewTaskPrompt {
     }
 
     close() {
-        this.taskDescription.value = "";
-        this.taskStartDate.value = "";
-        this.section.hidden = true;
-        this.section.classList.remove("popup");
+        this.section.classList.add("offscreen");
+
+        setTimeout(() => {
+            this.taskDescription.value = "";
+            this.taskStartDate.value = "";
+            this.section.hidden = true;
+            this.section.classList.remove("popup");
+            this.section.classList.remove("offscreen");
+        }, 250);
     }
 }
