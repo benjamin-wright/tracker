@@ -1,4 +1,6 @@
 #menu-button {
+    position: relative;
+    z-index: 11;
     border: none;
     border-radius: 2px;
     cursor: pointer;
@@ -42,4 +44,45 @@
 #menu-button.expanded div::after {
     margin-top: 0;
     transform: rotate(-405deg);
+}
+
+.off-right {
+    transform: translateX(100%);
+}
+
+.header-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 10;
+    padding: 0.5em 2em;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.header-overlay {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--main-popup-bg-color);
+    transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.header-menu button {
+    cursor: pointer;
+    margin: 0.5em 0;
+
+    border: none;
+    border-radius: 0.25em;
+    color: rgb(46, 51, 61);
+    background-color: var(--main-fg-color);
+    padding: 1em;
+    line-height: 0%;
+    border: solid 2px transparent;
 }

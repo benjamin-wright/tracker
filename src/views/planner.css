@@ -145,18 +145,26 @@
     align-items: center;
     justify-content: center;
     background-color: var(--main-popup-bg-color);
-    z-index: 3;
+    z-index: 20;
+
+    transition: transform 250ms ease-out;
+}
+
+.popup.offscreen {
+    transform: translateY(-100vh);
 }
 
 .popup.offscreen form {
+    transform: translateY(100vh);
     margin-top: -3em;
     opacity: 0;
 }
 
 .popup form {
+    transform: translateY(0%);
     margin-top: 0;
     opacity: 1;
-    transition: margin-top 250ms ease-out, opacity 250ms ease-out;
+    transition: margin-top 250ms ease-out, opacity 250ms ease-out, transform 250ms ease-out;
     padding: 2em;
     border-radius: 1em;
     background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
