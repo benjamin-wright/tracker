@@ -4,9 +4,10 @@ import Task from "./models/task";
 import HeaderBar from "./views/header-bar";
 import WeekPlanner from "./views/week-planner";
 import Week from "./models/week";
+import { loadFile, saveFile } from "./utils/io";
 
 const start = async () => {
-    new HeaderBar(document.body);
+    const header = new HeaderBar(document.body);
     const planner = new WeekPlanner(document.body);
     let week = Week.ThisWeek();
 
@@ -45,6 +46,22 @@ const start = async () => {
     planner.endTaskPrompt.onEnd(async (t: Task, end: Date) => {
         await tasks.completeTask(t, end);
         await render();
+    });
+
+    header.onSave(async () => {
+        const data = {
+            finishedTasks: await tasks.getAllFinishedTasks(),
+            openTasks: await tasks.getAllOpenTasks(),
+            lookup: await tasks.getAllLookups(),
+        };
+
+        await saveFile(document, "tasks.json", JSON.stringify(data));
+    });
+
+    header.onLoad(async () => {
+        const data = await loadFile(document);
+
+        console.log(JSON.parse(data));
     });
 
     document.onclick = () => planner.unfocus();
