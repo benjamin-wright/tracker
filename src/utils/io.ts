@@ -32,7 +32,7 @@ export async function loadFile(doc: Document): Promise<string> {
 
     const reader = new FileReader();
 
-    const result = await new Promise((resolve, reject) => {
+    const result = await new Promise((resolve, _) => {
         reader.addEventListener('load', (event) => {
             resolve(event.target?.result);
         });

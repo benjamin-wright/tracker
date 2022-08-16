@@ -11,7 +11,7 @@ export default {
     },
     plugins: [
         handlebars({
-            partialDirectory: resolve(__dirname, 'src/views/partials'),
+            partialDirectory: resolve(__dirname, 'src/views'),
         }),
     ]
 }

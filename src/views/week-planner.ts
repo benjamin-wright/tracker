@@ -1,4 +1,4 @@
-import './planner.css';
+import './week-planner.css';
 
 import * as find from '../utils/find';
 import * as graphics from '../utils/graphics';
@@ -117,11 +117,11 @@ export default class WeekPlanner {
 
             task.setAttribute("style", `margin-left:${startMargin * 100}%;margin-right:${endMargin * 100}%; min-width:${taskLength * 100}%`);
             task.title = `Task: ${t.getContent()}\nStart: ${taskStart.toLocaleTimeString()}`;
-            
+
             if (week.includes(taskStart)) {
                 task.classList.add("started");
             }
-            
+
             if (taskEnd && week.includes(taskEnd)) {
                 task.classList.add("complete");
             }
