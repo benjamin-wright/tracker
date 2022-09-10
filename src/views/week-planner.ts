@@ -122,8 +122,11 @@ export default class WeekPlanner {
                 task.classList.add("started");
             }
 
-            if (taskEnd && week.includes(taskEnd)) {
-                task.classList.add("complete");
+            if (taskEnd) {
+                task.classList.add("ended");
+                if (week.includes(taskEnd)) {
+                    task.classList.add("complete");
+                }
             }
 
             task.onclick = (event) => {

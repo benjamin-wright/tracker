@@ -129,7 +129,7 @@
     display: block;
 }
 
-.task.focus.complete button {
+.task.focus.complete button, .task.focus.ended button {
     display: none;
 }
 
