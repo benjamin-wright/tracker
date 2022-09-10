@@ -19,7 +19,6 @@
     flex-direction: column;
     pointer-events: none;
     position: relative;
-    padding-top: 1em;
     z-index: 1;
 }
 
@@ -28,6 +27,11 @@
     justify-content: space-between;
     grid-template-columns: 2.5em auto 2.5em;
     margin-bottom: 1em;
+}
+
+.header-pad {
+    visibility: hidden;
+    max-width: 20%;
 }
 
 #planner-nav div {
@@ -44,6 +48,7 @@
 
 #planner-nav .new {
     grid-column: 3;
+    margin: auto 0;
 }
 
 #planner h2 {
@@ -114,6 +119,10 @@
     white-space: nowrap;
     padding: 0.5em;
     flex-grow: 1;
+}
+
+.task.focus p {
+    white-space: pre-wrap;
 }
 
 .task button {

@@ -1,6 +1,5 @@
-import { getDaySuffix, paddedString } from "../utils/date";
+import { getDaySuffix, paddedString, toShortDayString } from "../utils/date";
 
-const DAYS_MAP_SHORT = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
 const DAY_START_TIME = 9;
 const DAY_END_TIME = 17;
 
@@ -12,7 +11,7 @@ export default class Day {
     }
 
     toShortString(): string {
-        return DAYS_MAP_SHORT[this.date.getDay()];
+        return toShortDayString(this.date);
     }
 
     toDayOfMonth(): string {

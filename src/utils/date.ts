@@ -81,3 +81,20 @@ export function getDaySuffix(day: number): string {
             return "th";
     }
 }
+
+const DAYS_MAP_SHORT = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
+export function toShortDayString(date: Date): string {
+    return DAYS_MAP_SHORT[date.getDay()];
+}
+
+export function toHourString(date: Date): string {
+    let hour = date.getHours();
+    const am = hour < 12;
+
+    hour = hour % 12;
+    if (hour === 0) {
+        hour = 12;
+    }
+    
+    return `${hour}${am ? 'am' : 'pm'}`;
+}

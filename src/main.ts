@@ -3,17 +3,21 @@ import "./styles.css"
 import Task from "./models/task";
 import HeaderBar from "./views/header-bar";
 import WeekPlanner from "./views/week-planner";
+import Report from "./views/report";
 import Week from "./models/week";
 import { loadFile, saveFile } from "./utils/io";
 
 const start = async () => {
     const header = new HeaderBar(document.body);
     const planner = new WeekPlanner(document.body);
+    const report = new Report(document.body);
     let week = Week.ThisWeek();
 
     const tasks = await Tasks.create(window.indexedDB);
     const render = async () => {
-        planner.render(week, await tasks.getTasks(week));
+        const currentTasks = await tasks.getTasks(week);
+        planner.render(week, currentTasks);
+        report.render(week, currentTasks)
     }
 
     planner.nav.onNew(() => planner.newTaskPrompt.open());

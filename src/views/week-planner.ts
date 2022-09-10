@@ -41,12 +41,12 @@ export default class WeekPlanner {
 
         this.clear();
 
-        this.nav.update(`Week: ${week.toDateString()}`);
+        this.nav.update(week.toDateString());
 
         this.headers.append(...this.makeHeaders(week));
 
         this.taskList = this.makeTasks(week, tasks);
-        this.tasks.append(...this.taskList);
+        this.tasks.append(this.makePaddingHeader(), ...this.taskList);
     }
 
     clear() {
@@ -84,6 +84,17 @@ export default class WeekPlanner {
 
             return header;
         });
+    }
+
+    private makePaddingHeader(): HTMLElement {
+        const padding = this.tasks.ownerDocument.createElement('div');
+        const content = this.tasks.ownerDocument.createElement('p');
+
+        content.innerHTML = "Mon 31st";
+        padding.append(content);
+        padding.classList.add("header-pad");
+
+        return padding;
     }
 
     private makeTasks(week: Week, tasks: Task[]): HTMLElement[] {

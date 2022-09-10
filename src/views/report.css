@@ -1,0 +1,23 @@
+#report table {
+    text-align: left;
+    border: solid 2px;
+    border-collapse: collapse;
+}
+
+#report tr:first-child {
+    border-bottom: solid 2px;
+}
+
+#report tr:not(last-child) {
+    border-bottom: solid 1px;
+}
+
+#report td, #report th {
+    padding: 0.25em;
+}
+
+#report td:not(:last-child),
+#report th:not(:last-child) {
+    border-right: solid 1px;
+    padding-right: 1em;
+}
