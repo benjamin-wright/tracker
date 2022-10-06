@@ -6,3 +6,4 @@ Track work tasks throughout the week
 
 - Add swim lanes for related tasks
 - Stable sort for tasks
+- Make available offline
