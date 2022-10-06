@@ -4,19 +4,16 @@ import * as find from '../utils/find';
 import * as date from '../utils/date';
 import './report.css';
 
-export default class Report {
-    private finishedTasks: HTMLTableElement;
-    private startedTasks: HTMLTableElement;
-    private ongoingTasks: HTMLTableElement;
+const MILLIS_PER_HOUR = 1000 * 60 * 60;
+const MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 
+export default class Report {
+    private report: HTMLTableElement;
     private reportHeaderTemplate: HTMLTemplateElement;
     private reportItemTemplate: HTMLTemplateElement;
 
     constructor(body: HTMLElement) {
-        this.finishedTasks = find.byId(body, "report-finished");
-        this.startedTasks = find.byId(body, "report-started");
-        this.ongoingTasks = find.byId(body, "report-ongoing");
-
+        this.report = find.byId(body, "report-table");
         this.reportHeaderTemplate = find.byId(body, "report-header");
         this.reportItemTemplate = find.byId(body, "report-item");
     }
@@ -29,24 +26,21 @@ export default class Report {
         });
 
         const finishedTasks: Task[] = [];
-        const ongoingTasks: Task[] = [];
-        const startedTasks: Task[] = [];
+        // const ongoingTasks: Task[] = [];
+        // const startedTasks: Task[] = [];
 
         sortedTasks.forEach(t => {
             const end = t.getEnd();
             if (end && week.includes(end)) {
                 finishedTasks.push(t);
-            } else if (week.includes(t.getStart())) {
-                startedTasks.push(t);
-            } else {
-                ongoingTasks.push(t);
+            // } else if (week.includes(t.getStart())) {
+            //     startedTasks.push(t);
+            // } else {
+            //     ongoingTasks.push(t);
             }
         });
 
-        this.finishedTasks.append(...this.makeTableRows(finishedTasks, true));
-        this.startedTasks.append(...this.makeTableRows(startedTasks, false));
-        this.ongoingTasks.append(...this.makeTableRows(ongoingTasks, false));
-
+        this.report.append(...this.makeTableRows(finishedTasks, true));
     }
 
     makeTableRows(tasks: Task[], showEnd: boolean): HTMLTableRowElement[] {
@@ -57,6 +51,7 @@ export default class Report {
 
         if(!showEnd) {
             const cols = header.getElementsByTagName('th');
+            header.removeChild(cols[2]);
             header.removeChild(cols[1]);
         }
 
@@ -71,12 +66,20 @@ export default class Report {
             cols[0].innerText = t.getContent();
 
             if (showEnd) {
+                const start = t.getStart();
                 const end = t.getEnd();
                 if (!end) {
                     throw new Error("this shouldn't be possible!");
                 }
 
                 cols[1].innerText = `${date.toShortDayString(end)} ${date.toHourString(end)}`;
+                
+                const elapsed = (end.getTime() - start.getTime());
+                if (elapsed / MILLIS_PER_HOUR < 24) {
+                    cols[2].innerText = `${Math.round(elapsed / MILLIS_PER_HOUR)} hours`;
+                } else {
+                    cols[2].innerText = `${Math.round(elapsed / MILLIS_PER_DAY)} days`;
+                }
             } else {
                 item.removeChild(cols[1]);
             }
@@ -88,14 +91,8 @@ export default class Report {
     }
 
     clear() {
-        while (this.finishedTasks.firstChild) {
-            this.finishedTasks.removeChild(this.finishedTasks.firstChild);
-        }
-        while (this.startedTasks.firstChild) {
-            this.startedTasks.removeChild(this.startedTasks.firstChild);
-        }
-        while (this.ongoingTasks.firstChild) {
-            this.ongoingTasks.removeChild(this.ongoingTasks.firstChild);
+        while (this.report.firstChild) {
+            this.report.removeChild(this.report.firstChild);
         }
     }
 }

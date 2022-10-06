@@ -4,6 +4,12 @@
     border-collapse: collapse;
 }
 
+#report table {
+    text-align: left;
+    border: solid 2px;
+    border-collapse: collapse;
+}
+
 #report tr:first-child {
     border-bottom: solid 2px;
 }
