@@ -6,5 +6,3 @@ Track work tasks throughout the week
 
 - Add swim lanes for related tasks
 - Stable sort for tasks
-- Hide report sections when empty
-- Styling overhaul
