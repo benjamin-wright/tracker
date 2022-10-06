@@ -1,10 +1,10 @@
 :root {
-    --main-bg-color: rgb(46, 51, 61);
-    --secondary-bg-color: rgb(7, 21, 52);
-    --main-fg-color: rgb(217, 255, 249);
-    --main-highlight-color: rgb(133, 255, 237);
-    --main-popup-bg-color: rgba(3, 11, 27, 0.926);
-    --main-neg-bg-color: rgb(196, 160, 172);
+    --main-bg-color: rgb(192, 200, 228);
+    --secondary-bg-color: rgb(187, 207, 251);
+    --main-fg-color: rgb(28, 45, 66);
+    --main-highlight-color: rgb(54, 139, 118);
+    --main-popup-bg-color: rgba(142, 162, 202, 0.9);
+    --main-neg-bg-color: rgb(218, 71, 71);
     --main-neg-highlight-color: red;
     --main-start-color: green;
     --main-end-color: red;
@@ -51,11 +51,11 @@ header {
 .button {
     border: none;
     border-radius: 0.25em;
-    color: rgb(46, 51, 61);
-    background-color: var(--main-fg-color);
+    color: var(--main-fg-color);
+    background-color: var(--main-bg-color);
     padding: 1em;
     line-height: 0%;
-    border: solid 2px transparent;
+    border: solid 2px var(--main-fg-color);
 }
 
 .button:hover, .button:focus {

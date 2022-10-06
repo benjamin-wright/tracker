@@ -29,12 +29,12 @@ export default class HeaderBar {
     expand() {
         if (this.button.classList.contains("expanded")) {
             this.button.classList.remove("expanded");
-            this.overlay.classList.add("off-right");
-            this.menu.classList.add("off-right");
+            this.overlay.classList.remove("on-screen");
+            this.menu.classList.remove("on-screen");
         } else {
             this.button.classList.add("expanded");
-            this.overlay.classList.remove("off-right");
-            this.menu.classList.remove("off-right");
+            this.overlay.classList.add("on-screen");
+            this.menu.classList.add("on-screen");
         }
     }
 
