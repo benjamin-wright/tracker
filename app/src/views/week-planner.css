@@ -175,7 +175,7 @@
     padding: 2em;
     border-radius: 0.25em;
     box-shadow: 0 0 3px;
-    background-image: linear-gradient(to bottom right, var(--main-bg-color), var(--secondary-bg-color));
+    background-color: var(--secondary-bg-color);
     display: flex;
     flex-direction: column;
 }
