@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "watch": "tsc && vite build --watch",
+    "build": "tsc && vite build --mode production",
+    "watch": "tsc && vite build --watch --mode dev",
     "preview": "vite preview",
     "test": "jest ./src --verbose --silent"
   },

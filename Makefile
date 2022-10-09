@@ -20,8 +20,6 @@ stop:
 test:
 	(cd app && npm run test)
 
-build:
-	(cd app && npm run build)
-
 publish:
-	gcloud storage cp -r ./app/dist/ tracker.ponglehub.co.uk/
+	(cd app && npm run build)
+	gcloud storage cp -r ./app/dist/* gs://tracker.ponglehub.co.uk/
