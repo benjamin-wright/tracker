@@ -151,6 +151,18 @@ describe("tasks", () => {
                     ],
                     lookup: { "2021-5-17": [ 1 ], "2021-5-24": [ 1 ] }
                 }
+            },
+            {
+                name: "should unfinish a task",
+                existing: [
+                    new Task("task 1", new Date("2021-05-24T10:00:00.000Z"), new Date("2021-05-24T15:00:00.000Z"), 1),
+                ],
+                update: new Task("task 1 (unfinished)", new Date("2021-05-24T10:00:00.000Z"), undefined, 1),
+                expected: {
+                    openTasks: [
+                        { id: 1, content: "task 1 (unfinished)", start: new Date("2021-05-24T10:00:00.000Z") }
+                    ]
+                }
             }
         ].forEach(test => {
             it(test.name, async () => {

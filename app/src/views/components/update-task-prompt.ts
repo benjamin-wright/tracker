@@ -1,3 +1,5 @@
+import './update-task-prompt.css';
+
 import { toRFC3339String } from '../../utils/date';
 import * as find from '../../utils/find';
 import Task from '../../models/task';
@@ -11,6 +13,7 @@ export default class UpdateTaskPrompt {
     private taskEndDate: HTMLInputElement;
     private taskEndDateFieldset: HTMLFieldSetElement;
     private taskDelete: HTMLInputElement;
+    private taskUnfinish: HTMLInputElement;
     private updateTaskCallback: (t: Task) => void = (_t: Task) => {};
     private deleteTaskCallback: (t: Task) => void = (_t: Task) => {};
 
@@ -22,6 +25,7 @@ export default class UpdateTaskPrompt {
         this.taskEndDate = find.byId(section, "update-task-end-date");
         this.taskEndDateFieldset = find.byId(section, "update-task-end-date-fieldset");
         this.taskDelete = find.byId(section, "update-task-delete");
+        this.taskUnfinish = find.byId(section, "update-task-unfinish");
 
         this.form.onsubmit = (ev: SubmitEvent) => {
             ev.preventDefault();
@@ -39,6 +43,9 @@ export default class UpdateTaskPrompt {
 
             if (ev.submitter == this.taskDelete) {
                 this.deleteTaskCallback(this.task);
+            } else if (ev.submitter == this.taskUnfinish) {
+                this.task.unsetEnd();
+                this.updateTaskCallback(this.task);
             } else {
                 this.updateTaskCallback(this.task);
             }

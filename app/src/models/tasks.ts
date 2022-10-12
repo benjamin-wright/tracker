@@ -29,13 +29,22 @@ export default class Tasks {
 
     async updateTask(task: Task): Promise<void> {
         if (task.getEnd()) {
-            const [ original ] = await this.db.getFinishedTasks([task.getId()]);
-            await this.db.removeLookup(task.getId(), getWeekStrings(original.getStart(), original.getEnd()));
-    
-            await this.db.updateFinishedTask(task);
-            await this.db.addLookup(task.getId(), getWeekStrings(task.getStart(), task.getEnd()))
+            try {
+                const [ original ] = await this.db.getFinishedTasks([task.getId()]);
+                await this.db.removeLookup(task.getId(), getWeekStrings(original.getStart(), original.getEnd()));
+            } finally {
+                await this.db.updateFinishedTask(task);
+                await this.db.addLookup(task.getId(), getWeekStrings(task.getStart(), task.getEnd()))
+            }
         } else {
-            await this.db.updateOpenTask(task);
+            try {
+                const [ original ] = await this.db.getFinishedTasks([task.getId()]);
+                await this.db.removeFinishedTask(task);
+                await this.db.removeLookup(task.getId(), getWeekStrings(original.getStart(), original.getEnd()));
+                await this.db.addOpenTask(task);
+            } catch {
+                await this.db.updateOpenTask(task);
+            }
         }
     }
 

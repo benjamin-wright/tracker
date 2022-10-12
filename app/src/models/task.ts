@@ -47,6 +47,10 @@ export default class Task {
         this.end = end;
     }
 
+    unsetEnd() {
+        delete this.end;
+    }
+
     isEnded(): boolean {
         return this.end !== undefined;
     }

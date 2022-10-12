@@ -1,0 +1,15 @@
+button.unfinish {
+    padding: 0.55em;
+    margin-left: 0.25em;
+    background-color: var(--main-neg-bg-color);
+    border: 1px solid var(--main-fg-color);
+}
+
+button.unfinish:active {
+    background-color: var(--main-neg-highlight-color);
+    border: 1px solid var(--main-neg-highlight-color);
+}
+
+button.unfinish:focus {
+    background-color: var(--main-neg-highlight-color);
+}

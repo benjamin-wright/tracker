@@ -164,7 +164,13 @@ export default class TaskDB {
 
                 return new Promise((resolve, reject) => {
                     request.onerror = () => reject(new Error(`failed to get finished tasks: ${request.error?.message}`));
-                    request.onsuccess = () => resolve(Task.deserialize(request.result));
+                    request.onsuccess = () => {
+                        if (request.result) {
+                            resolve(Task.deserialize(request.result));
+                        } else {
+                            reject(new Error(`failed to get finished tasks: not found`));
+                        }
+                    }
                 });
             })
         );
