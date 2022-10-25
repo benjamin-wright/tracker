@@ -1,6 +1,24 @@
 import Task from "./task";
 
 export default class TaskDB {
+    static reset(indexedDB: IDBFactory): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.deleteDatabase("tracker-tasks");
+
+            request.onerror = event => {
+                reject(`Failed to open database with error: ${JSON.stringify(event.target)}`);
+            };
+
+            request.onblocked = event => {
+                reject(`Failed to open database with blocked: ${JSON.stringify(event.target)}`);
+            };
+
+            request.onsuccess = () => {
+                resolve();
+            }
+        });
+    }
+
     static create(indexedDB: IDBFactory): Promise<TaskDB> {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("tracker-tasks", 1);

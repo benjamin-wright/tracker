@@ -6,6 +6,7 @@ import WeekPlanner from "./views/week-planner";
 import Report from "./views/report";
 import Week from "./models/week";
 import { loadFile, saveFile } from "./utils/io";
+import TaskDB from "./models/taskDB";
 
 const start = async () => {
     const header = new HeaderBar(document.body);
@@ -50,6 +51,11 @@ const start = async () => {
     planner.endTaskPrompt.onEnd(async (t: Task, end: Date) => {
         await tasks.completeTask(t, end);
         await render();
+    });
+
+    header.onReset(async () => {
+        await TaskDB.reset(window.indexedDB);
+        location.reload();
     });
 
     header.onSave(async () => {

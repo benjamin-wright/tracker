@@ -88,3 +88,19 @@
     margin: 0.5em 0;
     line-height: 0%;
 }
+
+.header-menu .button.dangerzone {
+    background: var(--main-neg-bg-color);
+}
+
+.header-menu .button.dangerzone.clickable {
+    border-style: dashed;
+}
+
+.header-menu .button.dangerzone:active {
+    background: var(--main-neg-highlight-color);
+}
+
+.header-menu .button.dangerzone:focus {
+    background: var(--main-neg-highlight-color);
+}
